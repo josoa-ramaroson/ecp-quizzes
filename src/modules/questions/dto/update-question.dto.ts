@@ -1,11 +1,6 @@
-import { EQuestionType } from "src/common";
+import { PartialType } from "@nestjs/mapped-types";
+import { CreateQuestionDto } from "./create-question.dto";
+import { IsNotEmpty, IsString, MaxLength } from "class-validator";
 
-export class UpdateQuestionDto {
-    id: string;
-    title: string;
-    description: string;
-    type: EQuestionType;
-    answersOptions: string[];
-    correctAnswer: string[];
-    comment?: string; 
+export class UpdateQuestionDto extends PartialType(CreateQuestionDto) {
 }

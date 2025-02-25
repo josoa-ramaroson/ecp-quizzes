@@ -1,20 +1,41 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { QuestionsModule } from './modules/questions/questions.module';
+import { Module, ValidationPipe } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import * as Joi from 'joi';
+
 import { MembersModule } from './modules/members/members.module';
-import { ConfigModule } from '@nestjs/config';
+import { QuestionsModule } from './modules/questions/questions.module';
+
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
+
+import { IEnvirenmentVariables } from './common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { APP_PIPE } from '@nestjs/core';
 
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      validationSchema: Joi.object<IEnvirenmentVariables>({   
+        MONGODB_URI: Joi.string().required(),
+        DATABASE_NAME: Joi.string().required(),
+      }),
     }), 
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>("MONGODB_URI"),
+        dbName: configService.get<string>("DATABASE_NAME"),
+      }),
+      inject: [ConfigService],
+    }),
+    MembersModule, 
     QuestionsModule, 
-    MembersModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+  ],
 })
 export class AppModule {}

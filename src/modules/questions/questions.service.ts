@@ -1,30 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { IQuestion } from 'src/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { EErrorMessage, IQuestion } from 'src/common';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { CreateQuestionDto } from './dto/create-question.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Question } from './schemas/question.schema';
 
 @Injectable()
 export class QuestionsService {
+    constructor(@InjectModel(Question.name) private readonly questionModel: Model<IQuestion>) {}
     
-    private readonly questions: IQuestion[] = [] ;
-
+    async create(createQuestionDto: CreateQuestionDto): Promise<IQuestion> {
+        const newQuestion = new this.questionModel(createQuestionDto);
+        return await newQuestion.save();
+    }
     async findAll() {
-        return "find All";
+        const existingQuestions = await this.questionModel.find();  
+        return existingQuestions;
     }
 
     async findOne(id: string): Promise<IQuestion> {
-        return this.questions.filter((value) => value.id == id)[0]
+        const existingQuestion = await this.questionModel.findById(id)
+        if (!existingQuestion)
+            throw new NotFoundException(EErrorMessage.QUESTIONS_NOT_FOUND)
+        
+        return existingQuestion;
     }
 
-    async create(question: CreateQuestionDto) {
-        this.questions.push({id: new Date().toISOString(), ...question});
+    async updateOne(id: string, updateQuestionDto: UpdateQuestionDto): Promise<IQuestion> {
+        const updatedQuestion = await this.questionModel.findByIdAndUpdate(id, updateQuestionDto);
+        if (!updatedQuestion)
+            throw new NotFoundException(EErrorMessage.UPDATED_QUESTION_NOT_FOUND)
+        return updatedQuestion;
     }
 
-    async update(question: UpdateQuestionDto) {
-        console.log("update");
-    }
-
-    async delete(id: string) {
-        console.log("delete");
+    async deleteOne(id: string): Promise<IQuestion> {
+        const deletedQuestion = await this.questionModel.findByIdAndDelete(id);
+        if (!deletedQuestion)
+            throw new NotFoundException(EErrorMessage.QUESTIONS_NOT_FOUND)
+        return deletedQuestion;
     }
 }

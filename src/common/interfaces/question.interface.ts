@@ -1,11 +1,12 @@
+import { Document, Types } from "mongoose";
 import { EQuestionType } from "../enums";
 
-export interface IQuestion {
-    id: string;
+export interface IQuestion extends Document {
+    _id: Types.ObjectId;
     title: string;
     description: string;
     type: EQuestionType;
     answersOptions: string[];
-    correctAnswer: string[];
+    correctAnswers: string[];
     comment?: string;
 }
