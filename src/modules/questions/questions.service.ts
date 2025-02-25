@@ -14,6 +14,7 @@ export class QuestionsService {
         const newQuestion = new this.questionModel(createQuestionDto);
         return await newQuestion.save();
     }
+    
     async findAll() {
         const existingQuestions = await this.questionModel.find();  
         return existingQuestions;

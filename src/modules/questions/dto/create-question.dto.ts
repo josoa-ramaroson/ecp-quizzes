@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsNotEmpty, IsString, MaxLength } from "class-validator";
+import { IsArray, IsEnum, isInt, IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator";
 import { EQuestionType } from "src/common";
 
 export class CreateQuestionDto {
@@ -24,4 +24,8 @@ export class CreateQuestionDto {
     @IsString()
     @MaxLength(1000)
     readonly comment: string; 
+
+    @IsNumber()
+    readonly score: number;
+
 }

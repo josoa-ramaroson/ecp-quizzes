@@ -8,5 +8,6 @@ export interface IQuestion extends Document {
     type: EQuestionType;
     answersOptions: string[];
     correctAnswers: string[];
+    score: number;
     comment?: string;
 }

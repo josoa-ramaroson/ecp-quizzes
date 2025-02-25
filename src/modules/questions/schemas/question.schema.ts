@@ -22,6 +22,9 @@ export class Question {
 
     @Prop()
     comment: string;
+
+    @Prop({ required: true })
+    score: number;
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);
