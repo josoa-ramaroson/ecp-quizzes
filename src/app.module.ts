@@ -12,6 +12,7 @@ import { AppController } from './app.controller';
 import { IEnvirenmentVariables } from './common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_PIPE } from '@nestjs/core';
+import { HashingModule } from './hashing/hashing.module';
 
 
 @Module({
@@ -31,7 +32,7 @@ import { APP_PIPE } from '@nestjs/core';
       inject: [ConfigService],
     }),
     MembersModule, 
-    QuestionsModule, 
+    QuestionsModule, HashingModule, 
   ],
   controllers: [AppController],
   providers: [

@@ -12,7 +12,7 @@ export class QuestionsController {
     @Post()
     @UsePipes(QuestionValidationPipe)
     async createOne(@Body() createQuestionDto: CreateQuestionDto) {
-        return this.questionService.create(createQuestionDto);
+        return this.questionService.createOne(createQuestionDto);
     }
 
     @Get()
@@ -26,6 +26,7 @@ export class QuestionsController {
     }
     
     @Put(":id")
+    @UsePipes(QuestionValidationPipe)
     async updateOne(@Param("id") id: string, @Body() updateQuestionDto: UpdateQuestionDto) {
         return this.questionService.updateOne(id, updateQuestionDto);
     }

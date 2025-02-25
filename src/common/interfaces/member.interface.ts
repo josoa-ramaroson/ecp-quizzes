@@ -7,4 +7,5 @@ export interface IMember extends Document {
     firstName: string;
     facebookName: string;
     role: EMemberRole;
+    password: string;
 }

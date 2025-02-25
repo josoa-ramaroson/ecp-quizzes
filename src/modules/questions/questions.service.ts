@@ -10,7 +10,7 @@ import { Question } from './schemas/question.schema';
 export class QuestionsService {
     constructor(@InjectModel(Question.name) private readonly questionModel: Model<IQuestion>) {}
     
-    async create(createQuestionDto: CreateQuestionDto): Promise<IQuestion> {
+    async createOne(createQuestionDto: CreateQuestionDto): Promise<IQuestion> {
         const newQuestion = new this.questionModel(createQuestionDto);
         return await newQuestion.save();
     }
@@ -22,7 +22,7 @@ export class QuestionsService {
     async findOne(id: string): Promise<IQuestion> {
         const existingQuestion = await this.questionModel.findById(id)
         if (!existingQuestion)
-            throw new NotFoundException(EErrorMessage.QUESTIONS_NOT_FOUND)
+            throw new NotFoundException(EErrorMessage.QUESTION_NOT_FOUND)
         
         return existingQuestion;
     }
@@ -37,7 +37,7 @@ export class QuestionsService {
     async deleteOne(id: string): Promise<IQuestion> {
         const deletedQuestion = await this.questionModel.findByIdAndDelete(id);
         if (!deletedQuestion)
-            throw new NotFoundException(EErrorMessage.QUESTIONS_NOT_FOUND)
+            throw new NotFoundException(EErrorMessage.QUESTION_NOT_FOUND)
         return deletedQuestion;
     }
 }
