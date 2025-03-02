@@ -25,6 +25,9 @@ export class Question {
 
     @Prop({ required: true })
     score: number;
+
+    @Prop()
+    creationDate: Date;
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);

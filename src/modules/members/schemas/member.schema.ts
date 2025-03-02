@@ -17,6 +17,9 @@ export class Member {
 
     @Prop({required: true})
     password: string;
+
+    @Prop()
+    totalScore: number;
 }
 
 export const MemberSchema = SchemaFactory.createForClass(Member);

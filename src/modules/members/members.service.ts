@@ -1,10 +1,9 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Member } from './schemas/member.schema';
-import { EErrorMessage,  IMember } from 'src/common';
 import { Model } from 'mongoose';
-import { CreateMemberDto } from './dto/create-member.dto';
-import { UpdateMemberDto } from './dto/update-member.dto';
+import { Member } from './schemas';
+import { EErrorMessage,  IMember } from 'src/common';
+import { CreateMemberDto, UpdateMemberDto } from './dto';
 
 @Injectable()
 export class MembersService {
@@ -17,11 +16,10 @@ export class MembersService {
             if (existingMember)
                 throw new ConflictException(EErrorMessage.MEMBER_ALREADY_EXISTS);
             
-            const newMember = new this.memberModel(createMemberDto);
+            const newMember = new this.memberModel({totalScore: 0, ...createMemberDto});
             return await newMember.save();
         }
         async findAll() {
-            
             const existingMember = await this.memberModel.find();  
             return existingMember;
         }
@@ -33,7 +31,15 @@ export class MembersService {
             
             return existingMember;
         }
-    
+
+        async findOneByEmail(email: string): Promise<IMember> {
+            const existingMember = await this.memberModel.findOne({ email: email })    
+            if (!existingMember)
+                throw new NotFoundException(EErrorMessage.AUTH_FAILED_ERROR);
+
+            return existingMember;
+        } 
+
         async updateOne(id: string, updateMemberDto: UpdateMemberDto): Promise<IMember> {
             const updatedMember = await this.memberModel.findByIdAndUpdate(id, updateMemberDto);
             if (!updatedMember)

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { QuestionsController } from './questions.controller';
 import { QuestionsService } from './questions.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Question, QuestionSchema } from './schemas/question.schema';
-import { QuestionValidationPipe } from './pipes/question-validation.pipe';
+import { Question, QuestionSchema } from './schemas';
+import { QuestionValidationPipe } from './pipes';
 
 @Module({
     imports: [MongooseModule.forFeature([{ name: Question.name, schema: QuestionSchema }])],
@@ -11,6 +11,7 @@ import { QuestionValidationPipe } from './pipes/question-validation.pipe';
     providers: [
         QuestionsService,
         QuestionValidationPipe
-    ]
+    ],
+    exports: [QuestionsService]
 })
 export class QuestionsModule {}

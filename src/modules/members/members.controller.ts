@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseInterceptors } from '@nestjs/common';
 import { MembersService } from './members.service';
-import { CreateMemberDto } from './dto/create-member.dto';
-import { HashPasswordInterceptor } from './interceptors/hash-password.interceptor';
-import { RemovePasswordInterceptor } from './interceptors/remove-password.interceptor';
-import { UpdateMemberDto } from './dto/update-member.dto';
+import { CreateMemberDto } from './dto';
+import { HashPasswordInterceptor } from './interceptors';
+import { RemovePasswordInterceptor } from './interceptors';
+import { UpdateMemberDto } from './dto';
 
 @Controller('members')
 export class MembersController {

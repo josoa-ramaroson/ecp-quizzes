@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UsePipes } from '@nestjs/common';
-import { CreateQuestionDto } from './dto/create-question.dto';
+import { CheckAnswersDto, CreateQuestionDto } from './dto';
+import { UpdateQuestionDto } from './dto';
+import { QuestionValidationPipe } from './pipes';
 import { QuestionsService } from './questions.service';
-import { UpdateQuestionDto } from './dto/update-question.dto';
-import { QuestionValidationPipe } from './pipes/question-validation.pipe';
 
 @Controller('questions')
 export class QuestionsController {
@@ -34,5 +34,10 @@ export class QuestionsController {
     @Delete(":id")
     async deleteOne(@Param("id") id: string) {
         return this.questionService.deleteOne(id);
+    }
+
+    @Post(":id/check-answers")
+    async checkAnswers(@Param("id") id: string, @Body() answersDto: CheckAnswersDto) {
+        return this.questionService.checkAnswers(id, answersDto.answers);
     }
 }

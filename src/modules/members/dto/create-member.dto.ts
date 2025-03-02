@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, MaxLength } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 import { EMemberRole } from "src/common";
 
 export class CreateMemberDto {
@@ -17,8 +17,8 @@ export class CreateMemberDto {
     readonly facebookName: string;
 
     @IsEnum(EMemberRole)
-    @IsNotEmpty()
-    readonly role: EMemberRole;
+    @IsOptional()
+    readonly role: EMemberRole = EMemberRole.APPRENTICE;
 
     @IsString()
     @IsNotEmpty()

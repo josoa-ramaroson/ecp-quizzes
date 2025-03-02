@@ -27,5 +27,4 @@ export class CreateQuestionDto {
 
     @IsNumber()
     readonly score: number;
-
 }

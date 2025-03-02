@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { MembersService } from './members.service';
 import { MembersController } from './members.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Member, MemberSchema } from './schemas/member.schema';
-import { HashingModule } from 'src/hashing/hashing.module';
+import { Member, MemberSchema } from './schemas';
+import { HashingModule } from 'src/shared';
 
 @Module({
   imports: [
@@ -14,6 +14,7 @@ import { HashingModule } from 'src/hashing/hashing.module';
   providers: [
     MembersService,
   ],
+  exports: [MembersService]
 })
 
 export class MembersModule {}
