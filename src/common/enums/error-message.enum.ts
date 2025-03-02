@@ -7,7 +7,7 @@ export enum EErrorMessage {
     MEMBER_NOT_FOUND = "The requested member is not found in the database.",
     UPDATED_MEMBER_NOT_FOUND = "The updated member is not in the database.",
     MEMBER_ALREADY_EXISTS = "The member already exists in the database.",
-    
+
     AUTH_FAILED_ERROR = "Invalid first name or password.",
     UNAUTHORIZED_ERROR = "Unauthorized access.",
     INVALID_TOKEN_ERROR = "Invalid token.",

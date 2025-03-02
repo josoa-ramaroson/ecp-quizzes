@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { MembersModule } from '../members/members.module';
 import { QuestionsModule } from '../questions/questions.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Quiz, QuizSchema } from './schema';
@@ -15,8 +14,7 @@ import { Question, QuestionSchema } from '../questions';
             { name: Quiz.name, schema: QuizSchema },
             { name: Question.name, schema: QuestionSchema},
         ]),
-        QuestionsModule, 
-        MembersModule
+        QuestionsModule
     ],
     controllers: [QuizzesController],
     providers: [
@@ -24,5 +22,6 @@ import { Question, QuestionSchema } from '../questions';
         VerifyOneQuestionIdPipe,
         VerifyManyQuestionIdPipe,
     ],
+    exports: [QuizzesService]
 })
 export class QuizzesModule {}

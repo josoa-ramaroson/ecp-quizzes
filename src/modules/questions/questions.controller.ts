@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseInterceptors, UsePipes } from '@nestjs/common';
 import { CheckAnswersDto, CreateQuestionDto } from './dto';
 import { UpdateQuestionDto } from './dto';
 import { QuestionValidationPipe } from './pipes';
 import { QuestionsService } from './questions.service';
+import { RemoveCorrectAnswerInterceptor } from './interceptors';
 
 @Controller('questions')
 export class QuestionsController {
@@ -21,6 +22,7 @@ export class QuestionsController {
     }
 
     @Get(":id")
+    @UseInterceptors(RemoveCorrectAnswerInterceptor)
     async findOne(@Param("id") id: string) {
         return this.questionService.findOne(id);
     }
@@ -37,7 +39,7 @@ export class QuestionsController {
     }
 
     @Post(":id/check-answers")
-    async checkAnswers(@Param("id") id: string, @Body() answersDto: CheckAnswersDto) {
-        return this.questionService.checkAnswers(id, answersDto.answers);
+    async checkAnswers(@Param("id") id: string, @Body() checkAnswersDto: CheckAnswersDto) {
+        return this.questionService.checkAnswers(id, checkAnswersDto);
     }
 }

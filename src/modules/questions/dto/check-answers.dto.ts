@@ -1,12 +1,18 @@
-import { IsArray, IsNotEmpty, IsString } from "class-validator";
+import { IsArray, IsMongoId, IsNotEmpty, IsString } from "class-validator";
 
 export class CheckAnswersDto {
     @IsArray()
-    @IsNotEmpty({ message: "Answers cannot be empty" })
-    @IsString({ each: true, message: "Each answer must be a string" })
+    @IsNotEmpty()
+    @IsString({ each: true })
     answers: string[];
-
+    
     @IsString()
     @IsNotEmpty()
+    @IsMongoId()
     memberId: string;
+
+    @IsString()
+    @IsMongoId()
+    @IsNotEmpty()
+    quizId: string;
 }

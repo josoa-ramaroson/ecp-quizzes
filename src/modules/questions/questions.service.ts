@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { EErrorMessage, IQuestion } from 'src/common';
-import { UpdateQuestionDto, CreateQuestionDto } from './dto';
+import { UpdateQuestionDto, CreateQuestionDto, CheckAnswersResponseDto, CheckAnswersDto } from './dto';
 import { Model } from 'mongoose';
 import { Question } from './schemas';
 
@@ -41,14 +41,21 @@ export class QuestionsService {
         return deletedQuestion;
     }
 
-    async checkAnswers(id: string, answers: string[]) {
+    async checkAnswers(id: string, checkAnswersDto: CheckAnswersDto): Promise<CheckAnswersResponseDto> {
+        // # 1 verify that it's a valid question from the database
         const existingQuestion = await this.questionModel.findById(id);
         if (!existingQuestion)
             throw new NotFoundException(EErrorMessage.QUESTION_NOT_FOUND);
+        // #2 take correct answers from the found questions and answers given by requests
         const correctAnswers = existingQuestion.correctAnswers;
+        const answers = checkAnswersDto.answers;
+        // #3 default value to 0 for the score
         let score = 0;
+        // #4 if anwsers match all correct answers we attribute the score
         if (answers.every(a => correctAnswers.includes(a)))
             score = existingQuestion.score;
-        return {score};
+        // #4 crafting the answer
+        const memberId = checkAnswersDto.memberId;
+        return {memberId, score};
     }
 }
