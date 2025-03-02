@@ -8,4 +8,5 @@ export interface IMember extends Document {
     facebookName: string;
     role: EMemberRole;
     password: string;
+    totalScore: number;
 }

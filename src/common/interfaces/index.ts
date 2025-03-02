@@ -1,11 +1,5 @@
-import { IQuestion } from "./question.interface";
-import { IMember } from "./member.interface";
-import { IEnvirenmentVariables } from "./environment-variables.interface";
-import { IHashingService } from "./hashing-service.interface";
-
-export {
-    IEnvirenmentVariables,
-    IHashingService,
-    IMember,
-    IQuestion,
-}
+export * from "./environment-variables.interface";
+export * from "./hashing-service.interface";
+export * from "./member.interface";
+export * from "./question.interface";
+export * from "./quiz.interface";

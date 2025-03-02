@@ -11,9 +11,8 @@ import { AppController } from './app.controller';
 
 import { IEnvirenmentVariables } from './common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { APP_PIPE } from '@nestjs/core';
-import { HashingModule } from './hashing/hashing.module';
 import { QuizzesModule } from './modules/quizzes/quizzes.module';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -22,8 +21,10 @@ import { QuizzesModule } from './modules/quizzes/quizzes.module';
       validationSchema: Joi.object<IEnvirenmentVariables>({   
         MONGODB_URI: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
       }),
     }), 
+
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -33,7 +34,9 @@ import { QuizzesModule } from './modules/quizzes/quizzes.module';
       inject: [ConfigService],
     }),
     MembersModule, 
-    QuestionsModule, HashingModule, QuizzesModule, 
+    QuestionsModule, 
+    QuizzesModule, 
+    AuthModule, 
   ],
   controllers: [AppController],
   providers: [

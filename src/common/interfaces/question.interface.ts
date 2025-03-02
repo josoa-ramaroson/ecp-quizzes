@@ -10,4 +10,5 @@ export interface IQuestion extends Document {
     correctAnswers: string[];
     score: number;
     comment?: string;
+    creationDate: Date;
 }
