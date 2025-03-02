@@ -8,13 +8,10 @@ import { HashingModule } from 'src/shared';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Member.name, schema: MemberSchema }]),
-    HashingModule
+    HashingModule,
   ],
   controllers: [MembersController],
-  providers: [
-    MembersService,
-  ],
-  exports: [MembersService]
+  providers: [MembersService],
+  exports: [MembersService],
 })
-
 export class MembersModule {}

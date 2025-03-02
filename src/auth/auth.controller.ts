@@ -5,12 +5,12 @@ import { PublicRoutes } from 'src/common';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-    @HttpCode(HttpStatus.OK)
-    @Post("login")
-    @PublicRoutes()
-    async signIn(@Body() signInDto: SignInDto) {
-        return await this.authService.signIn(signInDto);
-    }
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  @PublicRoutes()
+  async signIn(@Body() signInDto: SignInDto) {
+    return await this.authService.signIn(signInDto);
+  }
 }

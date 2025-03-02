@@ -1,21 +1,32 @@
-import { CallHandler, ExecutionContext, Inject, Injectable, NestInterceptor } from "@nestjs/common";
-import { Observable } from "rxjs";
-import { C_HASHING_SERVICE, IHashingService } from "src/common";
+import {
+  CallHandler,
+  ExecutionContext,
+  Inject,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { C_HASHING_SERVICE, IHashingService } from 'src/common';
 
 @Injectable()
 export class HashPasswordInterceptor implements NestInterceptor {
-    
-    constructor(@Inject(C_HASHING_SERVICE) private readonly hashingService: IHashingService) {}
-    
-    async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>>{
-       const httpCtx = context.switchToHttp();
+  constructor(
+    @Inject(C_HASHING_SERVICE) private readonly hashingService: IHashingService,
+  ) {}
 
-       const request = httpCtx.getRequest();
-        
-       if (request.body?.password) 
-           request.body.password = await this.hashingService.hashPassword(request.body.password);
+  async intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Promise<Observable<any>> {
+    const httpCtx = context.switchToHttp();
 
-       return next.handle();
-    }
-    
+    const request = httpCtx.getRequest();
+
+    if (request.body?.password)
+      request.body.password = await this.hashingService.hashPassword(
+        request.body.password,
+      );
+
+    return next.handle();
+  }
 }

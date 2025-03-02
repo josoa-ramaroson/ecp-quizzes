@@ -1,2 +1,2 @@
-export * from "./hash-password.interceptor";
-export * from "./remove-password.interceptor";
+export * from './hash-password.interceptor';
+export * from './remove-password.interceptor';

@@ -1,5 +1,11 @@
-import { IsNotEmpty, IsNumber, IsString, Max, MaxLength } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Max,
+  MaxLength,
+} from 'class-validator';
 
 export class AddOneQuestionDto {
-    questionId: string;
-} 
+  questionId: string;
+}

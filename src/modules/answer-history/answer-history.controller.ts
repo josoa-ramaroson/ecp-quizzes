@@ -1,7 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AnswerHistoryService } from './answer-history.service';
-import { CreateAnswerHistoryDto } from './dto/create-answer-history.dto';
-import { UpdateAnswerHistoryDto } from './dto/update-answer-history.dto';
+import {  } from './dto';
+import { CreateAnswerHistoryDto } from './dto';
 
 @Controller('answer-history')
 export class AnswerHistoryController {
@@ -20,11 +28,6 @@ export class AnswerHistoryController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.answerHistoryService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAnswerHistoryDto: UpdateAnswerHistoryDto) {
-    return this.answerHistoryService.update(+id, updateAnswerHistoryDto);
   }
 
   @Delete(':id')

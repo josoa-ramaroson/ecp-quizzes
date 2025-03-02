@@ -1,2 +1,1 @@
-export * from "./question-validation.pipe";
-export * from "./member-id-validation.pipe";
+export * from './question-validation.pipe';

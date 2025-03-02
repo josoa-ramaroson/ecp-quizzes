@@ -1,2 +1,2 @@
-export * from "./hashing.module";
-export * from "./bcrypt-hashing.service";
+export * from './hashing.module';
+export * from './bcrypt-hashing.service';

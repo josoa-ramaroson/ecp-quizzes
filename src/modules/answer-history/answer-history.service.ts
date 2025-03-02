@@ -1,23 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAnswerHistoryDto } from './dto/create-answer-history.dto';
-import { UpdateAnswerHistoryDto } from './dto/update-answer-history.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { AnswerHistory } from './schemas';
+import { IAnswerHistory } from 'src/common';
+import { Model } from 'mongoose';
+import { CreateAnswerHistoryDto } from './dto';
 
 @Injectable()
 export class AnswerHistoryService {
-  create(createAnswerHistoryDto: CreateAnswerHistoryDto) {
-    return 'This action adds a new answerHistory';
+  constructor(
+    @InjectModel(AnswerHistory.name)
+    private readonly answerHistoryModel: Model<IAnswerHistory>,
+  ) {}
+
+  async create(
+    createAnswerHistoryDto: CreateAnswerHistoryDto,
+  ): Promise<IAnswerHistory> {
+    const newAnswerHistory = new this.answerHistoryModel(
+      createAnswerHistoryDto,
+    );
+    return await newAnswerHistory.save();
   }
 
-  findAll() {
-    return `This action returns all answerHistory`;
+  async findAll(): Promise<IAnswerHistory[]> {
+    return await this.answerHistoryModel.find();
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return `This action returns a #${id} answerHistory`;
-  }
-
-  update(id: number, updateAnswerHistoryDto: UpdateAnswerHistoryDto) {
-    return `This action updates a #${id} answerHistory`;
   }
 
   remove(id: number) {

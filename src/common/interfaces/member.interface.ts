@@ -1,12 +1,12 @@
-import { Document, Types } from "mongoose";
-import { EMemberRole } from "../enums";
+import { Document, Types } from 'mongoose';
+import { EMemberRole } from '../enums';
 
 export interface IMember extends Document {
-    _id: Types.ObjectId;
-    email: string;
-    firstName: string;
-    facebookName: string;
-    role: EMemberRole;
-    password: string;
-    totalScore: number;
+  _id: Types.ObjectId;
+  email: string;
+  firstName: string;
+  facebookName: string;
+  role: EMemberRole;
+  password: string;
+  totalScore: number;
 }

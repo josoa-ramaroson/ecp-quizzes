@@ -14,33 +14,30 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { QuizzesModule } from './modules/quizzes/quizzes.module';
 import { AuthModule } from './auth/auth.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
-      validationSchema: Joi.object<IEnvirenmentVariables>({   
+      validationSchema: Joi.object<IEnvirenmentVariables>({
         MONGODB_URI: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
       }),
-    }), 
+    }),
 
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>("MONGODB_URI"),
-        dbName: configService.get<string>("DATABASE_NAME"),
+        uri: configService.get<string>('MONGODB_URI'),
+        dbName: configService.get<string>('DATABASE_NAME'),
       }),
       inject: [ConfigService],
     }),
-    MembersModule, 
-    QuestionsModule, 
-    QuizzesModule, 
-    AuthModule, 
+    MembersModule,
+    QuestionsModule,
+    QuizzesModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

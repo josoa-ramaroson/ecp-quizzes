@@ -1,61 +1,93 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseInterceptors,
+} from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
-import { AddManyQuestionDto, AddOneQuestionDto, CreateQuizDto, UpdateQuizDto } from './dto';
-import { VerifyOneQuestionIdPipe } from './pipes/verify-one-question-id.pipe';
-import { VerifyManyQuestionIdPipe } from './pipes/verify-many-question-id.pipe';
+import {
+  AddManyQuestionDto,
+  AddOneQuestionDto,
+  CreateQuizDto,
+  EvaluateQuizDto,
+  UpdateQuizDto,
+} from './dto';
+import { MemberIdValidationPipe, VerifyOneQuestionIdPipe } from './pipes';
+import { VerifyManyQuestionIdPipe } from './pipes';
+import { AnswerHistoryInterceptor, ScoringInterceptor } from './interceptors';
 
 @Controller('quizzes')
 export class QuizzesController {
-    constructor(private readonly quizzesService: QuizzesService) {}
-    
-    @Get()
-    async findAll() {
-        return await this.quizzesService.findAll();
-    }
+  constructor(private readonly quizzesService: QuizzesService) {}
 
-    @Get(':id')
-    async findOne(@Param("id") id: string) {
-        return await this.quizzesService.findOne(id);
-    }
+  @Get()
+  async findAll() {
+    return await this.quizzesService.findAll();
+  }
 
-    @Post()
-    async createOne(@Body() createQuizDto: CreateQuizDto) {
-        return await this.quizzesService.createOne(createQuizDto);
-    }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.quizzesService.findOne(id);
+  }
 
-    @Put(":id")
-    async updateOne(
-        @Param("id") id: string, 
-        @Body() updateQuizDto: UpdateQuizDto
-    ) {
-        return await this.quizzesService.updateOne(id, updateQuizDto);
-    }
+  @Post()
+  async createOne(@Body() createQuizDto: CreateQuizDto) {
+    return await this.quizzesService.createOne(createQuizDto);
+  }
 
-    @Delete(":id")
-    async deleteOne(@Param("id") id: string) {
-        return await this.quizzesService.deleteOne(id);
-    }
+  @Put(':id')
+  async updateOne(
+    @Param('id') id: string,
+    @Body() updateQuizDto: UpdateQuizDto,
+  ) {
+    return await this.quizzesService.updateOne(id, updateQuizDto);
+  }
 
-    @Put(":id/question")
-    async addOneQuestionToQuiz(
-        @Param("id") quizId: string,
-        @Body(VerifyOneQuestionIdPipe) addOneQuestionDto: AddOneQuestionDto
-    ) {
-        return await this.quizzesService.addOneQuestionToQuiz(quizId, addOneQuestionDto);
-    }
+  @Delete(':id')
+  async deleteOne(@Param('id') id: string) {
+    return await this.quizzesService.deleteOne(id);
+  }
 
-    @Put(":id/questions")
-    async addManyQuestionsToQuiz(
-        @Param("id") quizId: string, 
-        @Body(VerifyManyQuestionIdPipe) addManyQuestionsDto: AddManyQuestionDto
-    ) {
-        return await this.quizzesService.addManyQuestionsToQuiz(quizId, addManyQuestionsDto);
-    }
+  @Put(':id/question')
+  async addOneQuestionToQuiz(
+    @Param('id') quizId: string,
+    @Body(VerifyOneQuestionIdPipe) addOneQuestionDto: AddOneQuestionDto,
+  ) {
+    return await this.quizzesService.addOneQuestionToQuiz(
+      quizId,
+      addOneQuestionDto,
+    );
+  }
 
-    @Delete(":id/question/:questionId")
-    async removeOneQuestionFromQuiz(@Param("id") quizId: string, @Param("questionId") questionId: string) {
-        return await this.quizzesService.removeQuestionToQuiz(quizId, questionId);
-    }
+  @Put(':id/questions')
+  async addManyQuestionsToQuiz(
+    @Param('id') quizId: string,
+    @Body(VerifyManyQuestionIdPipe) addManyQuestionsDto: AddManyQuestionDto,
+  ) {
+    return await this.quizzesService.addManyQuestionsToQuiz(
+      quizId,
+      addManyQuestionsDto,
+    );
+  }
+
+  @Post(':id/evaluate')
+  @UseInterceptors(ScoringInterceptor, AnswerHistoryInterceptor)
+  async evaluate(
+    @Param('id') id,
+    @Body(MemberIdValidationPipe) evaluateQuizResponseDto: EvaluateQuizDto,
+  ) {
+    return await this.quizzesService.evaluate(id, evaluateQuizResponseDto);
+  }
+
+  @Delete(':id/question/:questionId')
+  async removeOneQuestionFromQuiz(
+    @Param('id') quizId: string,
+    @Param('questionId') questionId: string,
+  ) {
+    return await this.quizzesService.removeQuestionToQuiz(quizId, questionId);
+  }
 }
-
-

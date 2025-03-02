@@ -3,7 +3,6 @@ import {
   IsArray,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -22,7 +21,7 @@ class AnswerRecordDto {
   isCorrect: boolean;
 }
 
-export class CreateAnswerHistoryDto {
+export class EvaluateQuizDto {
   @IsString()
   @IsNotEmpty()
   @IsMongoId()
@@ -33,8 +32,4 @@ export class CreateAnswerHistoryDto {
   @Type(() => AnswerRecordDto)
   @IsNotEmpty()
   answersRecord: AnswerRecordDto[];
-
-  @IsNumber()
-  @IsNotEmpty()
-  score: number;
 }

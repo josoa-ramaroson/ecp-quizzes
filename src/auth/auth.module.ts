@@ -11,13 +11,13 @@ import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     ConfigModule,
-    MembersModule, 
-    HashingModule, 
+    MembersModule,
+    HashingModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         global: true,
-        secret: configService.get<string>("JWT_SECRET"),
+        secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '7200s' },
       }),
       inject: [ConfigService],
@@ -30,6 +30,6 @@ import { APP_GUARD } from '@nestjs/core';
     //   provide: APP_GUARD,
     //   useClass: AuthGuard
     // },
-  ]
+  ],
 })
 export class AuthModule {}

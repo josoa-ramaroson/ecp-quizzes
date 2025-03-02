@@ -1,1 +1,1 @@
-export * from "./mongo-exceptions.filter";
+export * from './mongo-exceptions.filter';

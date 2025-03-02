@@ -1,1 +1,1 @@
-export * from "./answer-history.schema"
+export * from './answer-history.schema';
