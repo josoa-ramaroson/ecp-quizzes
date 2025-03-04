@@ -10,8 +10,7 @@ import {
 } from '@nestjs/common';
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto';
-import { HashPasswordInterceptor } from './interceptors';
-import { RemovePasswordInterceptor } from './interceptors';
+import { HashPasswordInterceptor, RemovePasswordInterceptor } from './interceptors';
 import { UpdateMemberDto } from './dto';
 
 @Controller('members')
@@ -19,25 +18,23 @@ export class MembersController {
   constructor(private readonly memberService: MembersService) {}
 
   @Get()
-  @UseInterceptors(RemovePasswordInterceptor)
   async findAll() {
     return await this.memberService.findAll();
   }
 
   @Get(':id')
-  @UseInterceptors(RemovePasswordInterceptor)
   async findOne(@Param('id') id: string) {
     return await this.memberService.findOne(id);
   }
 
   @Post()
-  @UseInterceptors(HashPasswordInterceptor, RemovePasswordInterceptor)
+  @UseInterceptors(HashPasswordInterceptor)
   async createOne(@Body() createMemberDto: CreateMemberDto) {
     return await this.memberService.createOne(createMemberDto);
   }
 
   @Put(':id')
-  @UseInterceptors(HashPasswordInterceptor, RemovePasswordInterceptor)
+  @UseInterceptors(HashPasswordInterceptor)
   async updateOne(
     @Param('id') id: string,
     @Body() updateMemberDto: UpdateMemberDto,

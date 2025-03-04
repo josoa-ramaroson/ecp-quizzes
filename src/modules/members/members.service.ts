@@ -31,12 +31,12 @@ export class MembersService {
     return await newMember.save();
   }
   async findAll() {
-    const existingMember = await this.memberModel.find();
+    const existingMember = await this.memberModel.find({}, { password: 0 });
     return existingMember;
   }
 
   async findOne(id: string): Promise<IMember> {
-    const existingMember = await this.memberModel.findById(id);
+    const existingMember = await this.memberModel.findById(id, { password:0 });
     if (!existingMember)
       throw new NotFoundException(EErrorMessage.MEMBER_NOT_FOUND);
 
@@ -44,7 +44,7 @@ export class MembersService {
   }
 
   async findOneByEmail(email: string): Promise<IMember> {
-    const existingMember = await this.memberModel.findOne({ email: email });
+    const existingMember = await this.memberModel.findOne({ email: email }, { password: 0 });
     if (!existingMember)
       throw new NotFoundException(EErrorMessage.AUTH_FAILED_ERROR);
 
@@ -58,6 +58,9 @@ export class MembersService {
     const updatedMember = await this.memberModel.findByIdAndUpdate(
       id,
       updateMemberDto,
+      { 
+        new: true, select: { password: 0 }
+      }
     );
     if (!updatedMember)
       throw new NotFoundException(EErrorMessage.UPDATED_MEMBER_NOT_FOUND);

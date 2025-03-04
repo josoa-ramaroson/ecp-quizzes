@@ -5,7 +5,6 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import { CreateQuestionDto } from '../dto/create-question.dto';
-import { isSubArray } from 'src/utils';
 import { UpdateQuestionDto } from '../dto/update-question.dto';
 import { EErrorMessage } from 'src/common';
 
@@ -16,12 +15,10 @@ export class QuestionValidationPipe implements PipeTransform {
     metadata: ArgumentMetadata,
   ) {
     const anwsersOptions = value.answersOptions!;
-    const correctAnswers = value.correctAnswers!;
-    if (!isSubArray<string>(anwsersOptions, correctAnswers)) {
-      throw new BadRequestException(
-        EErrorMessage.CORRECT_ANSWERS_NOT_IN_ANSWERS_OPTIONS,
-      );
-    }
+    const isCorrectAnswers = anwsersOptions.filter((a) => a.isCorrect);
+    if (isCorrectAnswers.length === 0) 
+      throw new BadRequestException(EErrorMessage.NO_CORRECT_ANSWER);
+    
 
     return value;
   }

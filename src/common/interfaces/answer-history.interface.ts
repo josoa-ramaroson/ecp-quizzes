@@ -6,6 +6,6 @@ export interface IAnswerHistory extends Document {
   quizId: Types.ObjectId;
   memberId: Types.ObjectId;
   answersRecord: IAnswerRecord[];
-  date: Date;
+  finishedAt: Date;
   score: number;
 }

@@ -13,6 +13,7 @@ import { IEnvirenmentVariables } from './common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { QuizzesModule } from './modules/quizzes/quizzes.module';
 import { AuthModule } from './auth/auth.module';
+import { AnswerHistoryModule } from './modules/answer-history/answer-history.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AuthModule } from './auth/auth.module';
     QuestionsModule,
     QuizzesModule,
     AuthModule,
+    AnswerHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

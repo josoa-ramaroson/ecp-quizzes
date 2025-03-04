@@ -1,7 +1,7 @@
-import { HttpStatus } from '@nestjs/common';
 
 export enum EQuestionType {
-  MULTIPLE_ANSWER = 'MULTIPLE_CHOICE',
-  SINGLE_ANSWER = 'SINGLE_CHOICE',
+  MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
+  SINGLE_CHOICE = "SINGLE_CHOICE",
+  TRUE_FALSE = "TRUE_FALSE",
   SHORT_ANSWER = 'SHORT_ANSWER',
 }

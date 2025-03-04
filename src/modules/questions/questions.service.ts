@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { EErrorMessage, IQuestion } from 'src/common';
-import { UpdateQuestionDto, CreateQuestionDto } from './dto';
+import { EErrorMessage, IAnswer, IQuestion } from 'src/common';
+import { UpdateQuestionDto, CreateQuestionDto, FindManyDto } from './dto';
 import { Model } from 'mongoose';
 import { Question } from './schemas';
+import { isSubArray } from 'src/utils';
 
 @Injectable()
 export class QuestionsService {
@@ -33,15 +34,20 @@ export class QuestionsService {
     return existingQuestion;
   }
 
-  async findMany(ids: string[]): Promise<IQuestion[]> {
+  async findMany(findManyDto: FindManyDto): Promise<IQuestion[]> {
     const existingQuestion = await this.questionModel.find({
-      _id: { $in: ids },
-    });
+      _id: { $in: findManyDto.questionsIds },
+    },
+    {
+      correctAnswers: 0,
+    }
+  );
     if (!existingQuestion)
       throw new NotFoundException(EErrorMessage.QUESTIONS_NOT_FOUND);
 
     return existingQuestion;
   }
+
 
   async updateOne(
     id: string,
@@ -63,20 +69,37 @@ export class QuestionsService {
     return deletedQuestion;
   }
 
-  async checkAnswers(id: string, answers: string[]): Promise<number> {
+  async checkAnswers(id: string, providedAnswers: string[]): Promise<number> {
     // # 1 verify that it's a valid question from the database
     const existingQuestion = await this.questionModel.findById(id);
     if (!existingQuestion)
       throw new NotFoundException(EErrorMessage.QUESTION_NOT_FOUND);
     // #2 take correct answers from the found questions
-    const correctAnswers = existingQuestion.correctAnswers;
-
+    const answersOptions = existingQuestion.answersOptions;
+    const correctAnswers = answersOptions
+                              .filter((a) => a.isCorrect)
+                              .map((a) => a.text);
+  
     // #3 default value to 0 for the score
     let score = 0;
-    // #4 if anwsers match all correct answers we attribute the score
-    if (answers.every((a) => correctAnswers.includes(a)))
-      score = existingQuestion.score;
 
+    // #4 check if the answers are correct
+    //  if provided answers is not a subarray of the correctAnswer thro
+    if(isSubArray<string>(correctAnswers, providedAnswers))
+        if ( correctAnswers.length == providedAnswers.length )
+          score = existingQuestion.score;
+        else
+          score = Math.round(existingQuestion.score / 2);
     return score;
+  }
+
+  async findCorrectAnswers(id: string): Promise<string[]> {
+    const existingQuestion = await this.questionModel.findById(id);
+    if (!existingQuestion)
+      throw new NotFoundException(EErrorMessage.QUESTION_NOT_FOUND);
+    const correctAnswers = existingQuestion.answersOptions
+      .filter((a) => a.isCorrect)
+      .map((a) => a.text);
+    return correctAnswers;
   }
 }

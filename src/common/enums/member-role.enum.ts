@@ -1,5 +1,5 @@
 export enum EMemberRole {
   APPRENTICE = 'APPRENTICE',
-  MENTOR = 'MENTOR',
+  MODERATOR = 'MODERATOR',
   ADMIN = 'ADMIN',
 }

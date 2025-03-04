@@ -19,7 +19,7 @@ export class CreateQuizDto {
 
   @IsDateString()
   @IsNotEmpty()
-  readonly date: Date;
+  readonly startDate: Date;
 
   @IsDateString()
   @IsNotEmpty()

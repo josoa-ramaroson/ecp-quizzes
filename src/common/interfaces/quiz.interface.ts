@@ -4,7 +4,7 @@ export interface IQuiz extends Document {
   _id: Types.ObjectId;
   title: string;
   description: string;
-  date: Date;
+  startDate: Date;
   deadline: Date;
   questions: string[];
   creationDate: Date;

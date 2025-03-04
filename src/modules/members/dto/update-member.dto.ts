@@ -4,5 +4,6 @@ import { IsNumber, IsOptional } from 'class-validator';
 
 export class UpdateMemberDto extends PartialType(CreateMemberDto) {
   @IsNumber()
+  @IsOptional()
   readonly totalScore: number;
 }

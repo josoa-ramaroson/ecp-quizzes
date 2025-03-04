@@ -7,5 +7,5 @@ import {
 } from 'class-validator';
 
 export class AddManyQuestionDto {
-  questionIds: string[];
+  questionsIds: string[];
 }

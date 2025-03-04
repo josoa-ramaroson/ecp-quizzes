@@ -11,7 +11,7 @@ export class Quiz {
   description: string;
 
   @Prop({ required: true })
-  date: Date;
+  startDate: Date;
 
   @Prop({ required: true })
   deadline: Date;

@@ -21,14 +21,14 @@ export class AnswerHistory {
   @Prop({ type: { type: Types.ObjectId, ref: Quiz.name, required: true } })
   quizId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: Member.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: Quiz.name, required: true })
   memberId: Types.ObjectId;
 
   @Prop({ type: [AnswersRecord], required: true })
   answersRecord: AnswersRecord;
 
   @Prop({ required: true, default: new Date() })
-  date: Date;
+  finishedAt: Date;
 
   @Prop({ type: Number, required: true, default: 0 })
   score: number;

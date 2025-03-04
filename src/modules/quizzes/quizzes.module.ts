@@ -4,13 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Quiz, QuizSchema } from './schema';
 import { QuizzesController } from './quizzes.controller';
 import { QuizzesService } from './quizzes.service';
-import {
-  MemberIdValidationPipe,
-  VerifyManyQuestionIdPipe,
-  VerifyOneQuestionIdPipe,
-} from './pipes';
+import { VerifyManyQuestionIdPipe, VerifyOneQuestionIdPipe } from './pipes';
 import { MembersModule } from '../members';
 import { AnswerHistoryModule } from '../answer-history/answer-history.module';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   imports: [
@@ -18,13 +15,13 @@ import { AnswerHistoryModule } from '../answer-history/answer-history.module';
     QuestionsModule,
     MembersModule,
     AnswerHistoryModule,
+    CommonModule,
   ],
   controllers: [QuizzesController],
   providers: [
     QuizzesService,
     VerifyOneQuestionIdPipe,
     VerifyManyQuestionIdPipe,
-    MemberIdValidationPipe,
   ],
   exports: [QuizzesService],
 })

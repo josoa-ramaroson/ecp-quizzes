@@ -16,9 +16,15 @@ import {
   EvaluateQuizDto,
   UpdateQuizDto,
 } from './dto';
-import { MemberIdValidationPipe, VerifyOneQuestionIdPipe } from './pipes';
+import { 
+  AnswerRecordValidationPipe, 
+  VerifyOneQuestionIdPipe,
+  MemberIdValidationPipe,
+  ParseDatePipe,
+ } from './pipes';
 import { VerifyManyQuestionIdPipe } from './pipes';
 import { AnswerHistoryInterceptor, ScoringInterceptor } from './interceptors';
+
 
 @Controller('quizzes')
 export class QuizzesController {
@@ -29,6 +35,16 @@ export class QuizzesController {
     return await this.quizzesService.findAll();
   }
 
+  @Get('by-date/:date')
+  async findByDate(@Param("date", ParseDatePipe) date: Date) {
+    return await this.quizzesService.findByDate(date);
+  }
+
+  @Get('before/:date')
+  async findBefore(@Param("date", ParseDatePipe) date: Date) {
+    return await this.quizzesService.findBefore(date);
+  }
+  
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.quizzesService.findOne(id);
@@ -78,7 +94,8 @@ export class QuizzesController {
   @UseInterceptors(ScoringInterceptor, AnswerHistoryInterceptor)
   async evaluate(
     @Param('id') id,
-    @Body(MemberIdValidationPipe) evaluateQuizResponseDto: EvaluateQuizDto,
+    @Body(MemberIdValidationPipe, AnswerRecordValidationPipe)
+    evaluateQuizResponseDto: EvaluateQuizDto,
   ) {
     return await this.quizzesService.evaluate(id, evaluateQuizResponseDto);
   }

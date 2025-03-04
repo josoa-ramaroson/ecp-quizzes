@@ -1,24 +1,17 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AnswerHistoryService } from './answer-history.service';
-import {  } from './dto';
-import { CreateAnswerHistoryDto } from './dto';
+
+import { MemberIdValidationPipe } from './pipes';
 
 @Controller('answer-history')
 export class AnswerHistoryController {
   constructor(private readonly answerHistoryService: AnswerHistoryService) {}
-
-  @Post()
-  create(@Body() createAnswerHistoryDto: CreateAnswerHistoryDto) {
-    return this.answerHistoryService.create(createAnswerHistoryDto);
-  }
 
   @Get()
   findAll() {
@@ -27,11 +20,16 @@ export class AnswerHistoryController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.answerHistoryService.findOne(+id);
+    return this.answerHistoryService.findOne(id);
+  }
+
+  @Get('by-member')
+  findByMember(@Query('memberId', MemberIdValidationPipe) memberId: string) {
+    return this.answerHistoryService.findByMember(memberId);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.answerHistoryService.remove(+id);
+    return this.answerHistoryService.remove(id);
   }
 }

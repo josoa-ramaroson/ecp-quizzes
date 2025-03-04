@@ -30,4 +30,9 @@ export enum EErrorMessage {
   INVALID_RESSOURCE_REFERENCE = 'Please verify the ressources references in the url.',
 
   INTERNAL_SERVER_ERROR = 'We got a problems from the server. Please try again later.',
+
+  ANSWER_HISTORY_NOT_FOUND = 'The requested answer history is not found in the database.',
+
+  INVALID_DATE_FORMAT = 'The format of the date is invalid.',
+  NO_CORRECT_ANSWER = "You should add at least one correct answer to the question.",
 }

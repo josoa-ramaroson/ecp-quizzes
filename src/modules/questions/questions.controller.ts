@@ -9,8 +9,11 @@ import {
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
-import { CreateQuestionDto } from './dto';
-import { UpdateQuestionDto } from './dto';
+import { 
+  CreateQuestionDto, 
+  FindManyDto, 
+  UpdateQuestionDto 
+} from './dto';
 import { QuestionValidationPipe } from './pipes';
 import { QuestionsService } from './questions.service';
 import { RemoveCorrectAnswerInterceptor } from './interceptors';
@@ -28,6 +31,11 @@ export class QuestionsController {
   @Get()
   async findAll() {
     return this.questionService.findAll();
+  }
+
+  @Post("find-many")
+  async findMany(@Body() findManyDto: FindManyDto) {
+    return this.questionService.findMany(findManyDto);
   }
 
   @Get(':id')

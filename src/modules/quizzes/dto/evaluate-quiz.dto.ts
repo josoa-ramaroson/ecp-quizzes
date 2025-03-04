@@ -8,7 +8,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-class AnswerRecordDto {
+export class AnswerRecordDto {
   @IsString()
   @IsMongoId()
   questionId: string;
@@ -16,9 +16,6 @@ class AnswerRecordDto {
   @IsArray()
   @IsNotEmpty({ each: true })
   answers: string[];
-
-  @IsOptional()
-  isCorrect: boolean;
 }
 
 export class EvaluateQuizDto {

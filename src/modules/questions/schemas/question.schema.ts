@@ -1,6 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { EQuestionType } from 'src/common';
+import { EQuestionType, IAnswer } from 'src/common';
+
+@Schema()
+class Answer implements IAnswer {
+  @Prop({ required: true })
+  text: string;
+
+  @Prop({ required: true })
+  isCorrect: boolean;
+}
 
 @Schema()
 export class Question {
@@ -14,10 +23,7 @@ export class Question {
   type: EQuestionType;
 
   @Prop({ required: true })
-  answersOptions: string[];
-
-  @Prop({ required: true })
-  correctAnswers: string[];
+  answersOptions: Answer[];
 
   @Prop()
   comment: string;
