@@ -6,6 +6,7 @@ export interface IQuiz extends Document {
   description: string;
   startDate: Date;
   deadline: Date;
-  questions: string[];
+  questionsIds: string[];
   creationDate: Date;
+  isPublished: boolean;
 }

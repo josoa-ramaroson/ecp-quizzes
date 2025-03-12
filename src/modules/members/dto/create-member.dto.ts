@@ -24,7 +24,7 @@ export class CreateMemberDto {
 
   @IsEnum(EMemberRole)
   @IsOptional()
-  readonly role: EMemberRole = EMemberRole.APPRENTICE;
+  readonly role: EMemberRole = EMemberRole.MEMBER;
 
   @IsString()
   @IsNotEmpty()

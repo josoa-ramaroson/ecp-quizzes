@@ -36,15 +36,16 @@ export class MembersService {
   }
 
   async findOne(id: string): Promise<IMember> {
-    const existingMember = await this.memberModel.findById(id, { password:0 });
+    const existingMember = await this.memberModel.findById(id, { password: 0 });
     if (!existingMember)
       throw new NotFoundException(EErrorMessage.MEMBER_NOT_FOUND);
-
-    return existingMember;
+    const memberObj = existingMember.toObject();
+    memberObj.rank = await this.getRank(id);
+    return memberObj;
   }
 
   async findOneByEmail(email: string): Promise<IMember> {
-    const existingMember = await this.memberModel.findOne({ email: email }, { password: 0 });
+    const existingMember = await this.memberModel.findOne({ email: email });
     if (!existingMember)
       throw new NotFoundException(EErrorMessage.AUTH_FAILED_ERROR);
 
@@ -58,9 +59,10 @@ export class MembersService {
     const updatedMember = await this.memberModel.findByIdAndUpdate(
       id,
       updateMemberDto,
-      { 
-        new: true, select: { password: 0 }
-      }
+      {
+        new: true,
+        select: { password: 0 },
+      },
     );
     if (!updatedMember)
       throw new NotFoundException(EErrorMessage.UPDATED_MEMBER_NOT_FOUND);
@@ -72,5 +74,26 @@ export class MembersService {
     if (!deletedMember)
       throw new NotFoundException(EErrorMessage.MEMBER_NOT_FOUND);
     return deletedMember;
+  }
+
+  async getMembersRanking() {
+    const members = await this.memberModel.find({}, { password: 0 });
+    const sortedMembers = members.sort((a, b) => b.totalScore - a.totalScore);
+    return sortedMembers;
+  }
+
+  async getRank(memberId: string): Promise<number> {
+    const membersWithRanking = await this.getMembersRanking();
+    // This is the issue - indexOf doesn't work with a callback function
+    // It should be findIndex instead, and we need to compare strings properly
+    const index = membersWithRanking.findIndex(
+      (member) => member._id.toString() === memberId,
+    );
+    // Add 1 to convert from zero-based index to rank (1-based)
+    return index !== -1 ? index + 1 : -1;
+  }
+
+  async getTotalCount() {
+    return await this.memberModel.countDocuments();
   }
 }

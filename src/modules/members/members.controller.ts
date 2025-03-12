@@ -10,7 +10,10 @@ import {
 } from '@nestjs/common';
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto';
-import { HashPasswordInterceptor, RemovePasswordInterceptor } from './interceptors';
+import {
+  HashPasswordInterceptor,
+  RemovePasswordInterceptor,
+} from './interceptors';
 import { UpdateMemberDto } from './dto';
 
 @Controller('members')

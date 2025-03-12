@@ -17,10 +17,13 @@ export class Quiz {
   deadline: Date;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: Question.name }] })
-  questions: Question[];
+  questionsIds: Question[];
 
   @Prop({ default: new Date() })
   creationDate: Date;
+
+  @Prop({ default: false })
+  isPublished: boolean;
 }
 
 export const QuizSchema = SchemaFactory.createForClass(Quiz);

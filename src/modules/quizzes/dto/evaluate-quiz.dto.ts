@@ -3,7 +3,6 @@ import {
   IsArray,
   IsMongoId,
   IsNotEmpty,
-  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -15,18 +14,13 @@ export class AnswerRecordDto {
 
   @IsArray()
   @IsNotEmpty({ each: true })
-  answers: string[];
+  answersIds: string[];
 }
 
 export class EvaluateQuizDto {
-  @IsString()
-  @IsNotEmpty()
-  @IsMongoId()
-  memberId: string;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => AnswerRecordDto)
   @IsNotEmpty()
-  answersRecord: AnswerRecordDto[];
+  answers: AnswerRecordDto[];
 }

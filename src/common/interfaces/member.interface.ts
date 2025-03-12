@@ -9,4 +9,5 @@ export interface IMember extends Document {
   role: EMemberRole;
   password: string;
   totalScore: number;
+  rank?: number;
 }

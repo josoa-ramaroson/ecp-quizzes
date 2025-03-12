@@ -19,9 +19,7 @@ export class AuthGuard implements CanActivate {
     private reflector: Reflector,
   ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
       IS_PUBLIC_ROUTE,
       [context.getHandler(), context.getClass()],
@@ -36,7 +34,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException(EErrorMessage.UNAUTHORIZED_ERROR);
     }
     try {
-      const payload = this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 

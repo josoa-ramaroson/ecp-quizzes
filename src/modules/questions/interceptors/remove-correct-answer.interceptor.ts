@@ -16,15 +16,20 @@ export class RemoveCorrectAnswerInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data: IQuestion | IQuestion[]) => {
         if (data) {
-          console.log(typeof data);
           if (Array.isArray(data)) {
             return data.map((question) => {
-              question.correctAnswers = [];
-              return question;
+              const answersOptions = question.answersOptions;
+              return {
+                ...question,
+                answersOptions: answersOptions.map((ans) => ans.text),
+              };
             });
           } else {
-            data.correctAnswers = [];
-            return data;
+            const answersOptions = data.answersOptions;
+            return {
+              ...data,
+              answersOptions: answersOptions.map((ans) => ans.text),
+            };
           }
         }
       }),

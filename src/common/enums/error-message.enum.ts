@@ -16,6 +16,7 @@ export enum EErrorMessage {
   QUIZZES_NOT_FOUND = 'The requested quizzes are not found in the database',
   UPDATED_QUIZ_NOT_FOUND = 'The updated quiz is not in the database.',
   QUIZZ_ALREADY_EXISTS = 'The quiz already exists in the database.',
+  QUIZZ_ALREADY_TAKEN = "The quiz you're trying to evaluate is already taken by the member",
 
   QUESTION_ALREADY_IN_THE_QUIZ = 'The question is already in the quiz.',
   QUESTIONS_ALREADY_IN_THE_QUIZ = 'The questions are already in the quiz.',
@@ -34,5 +35,6 @@ export enum EErrorMessage {
   ANSWER_HISTORY_NOT_FOUND = 'The requested answer history is not found in the database.',
 
   INVALID_DATE_FORMAT = 'The format of the date is invalid.',
-  NO_CORRECT_ANSWER = "You should add at least one correct answer to the question.",
+  NO_CORRECT_ANSWER = 'You should add at least one correct answer to the question.',
+  INVALID_ANSWER_OPTIONS = 'The provided answer options was invalid.',
 }

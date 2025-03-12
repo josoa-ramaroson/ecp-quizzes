@@ -9,14 +9,13 @@ import {
   isInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
 import { EQuestionType } from 'src/common';
-import { AnswersOptions } from './answers.dto';
-
-
+import { AnswersOptionsDto } from './answers.dto';
 
 export class CreateQuestionDto {
   @IsString()
@@ -31,15 +30,16 @@ export class CreateQuestionDto {
   @IsEnum(EQuestionType)
   readonly type: EQuestionType;
 
-  @IsArray({each: true})
-  @IsNotEmpty({each: true})
+  @IsArray()
+  @IsNotEmpty({ each: true })
   @ArrayNotEmpty()
-  @ValidateNested({each: true})
-  @Type(() => AnswersOptions)
-  readonly answersOptions: AnswersOptions[];
+  @ValidateNested({ each: true })
+  @Type(() => AnswersOptionsDto)
+  readonly answersOptions: AnswersOptionsDto[];
 
   @IsString()
   @MaxLength(1000)
+  @IsOptional()
   readonly comment: string;
 
   @IsNumber()

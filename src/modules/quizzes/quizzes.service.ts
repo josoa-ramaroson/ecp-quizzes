@@ -1,28 +1,30 @@
 import {
-  ConflictException,
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Quiz } from './schema';
-import { Model } from 'mongoose';
-import { EErrorMessage, IQuiz } from 'src/common';
+import { Model, Types } from 'mongoose';
+import { EErrorMessage, IQuestion, IQuiz } from 'src/common';
 import {
-  AddManyQuestionDto,
-  AddOneQuestionDto,
   AnswerRecordDto,
   CreateQuizDto,
   EvaluateQuizDto,
   EvaluateQuizResponseDto,
-  ResponseAnswerRecordDto,
+  ResponseQuestionOfQuizDto,
+  ResponseQuizzesOfMember,
   UpdateQuizDto,
 } from './dto';
 import { QuestionsService } from '../questions';
+import { AnswerHistoryService } from '../answer-history';
+import { getQuizStatus } from 'src/utils';
 
 @Injectable()
 export class QuizzesService {
   constructor(
     private readonly questionsService: QuestionsService,
+    private readonly answerHistoryService: AnswerHistoryService,
     @InjectModel(Quiz.name) private readonly quizModel: Model<IQuiz>,
   ) {}
 
@@ -43,31 +45,126 @@ export class QuizzesService {
     return existingQuizz;
   }
 
-  async findByDate(date: Date): Promise<IQuiz> {
-    const existingQuizz = await this.quizModel.findOne({
-      startDate: { $gte: date.setHours(0,0,0) },
-      deadline: {$lte: date.setHours(23,59,59)}
+  async findAllByDate(date: Date): Promise<IQuiz[]> {
+    const existingQuizz = await this.quizModel.find({
+      startDate: { $gte: date.setHours(0, 0, 0) },
+      deadline: { $lte: date.setHours(23, 59, 59) },
     });
 
     if (!existingQuizz)
       throw new NotFoundException(EErrorMessage.QUIZ_NOT_FOUND);
-    return existingQuizz
+    return existingQuizz;
   }
 
-  async findBefore(date: Date): Promise<IQuiz> {
+  async findOneByDate(date: Date): Promise<IQuiz> {
+    date.setUTCHours(0, 0, 0, 0);
+    const deadline = new Date(date);
+    deadline.setUTCDate(deadline.getDate() + 1);
+    deadline.setUTCHours(0, 0, 0, 0);
     const existingQuizz = await this.quizModel.findOne({
-      startDate: { $lte: date.setHours(23,59,59) }
+      startDate: { $gte: date },
+      deadline: { $lte: deadline },
+      isPublished: true,
     });
 
     if (!existingQuizz)
       throw new NotFoundException(EErrorMessage.QUIZ_NOT_FOUND);
-    return existingQuizz
+    return existingQuizz;
+  }
+
+  async findAllBefore(date: Date): Promise<IQuiz[]> {
+    const existingQuizz = await this.quizModel.find({
+      startDate: { $lte: date.setHours(23, 59, 59) },
+      isPublished: true,
+    });
+
+    if (!existingQuizz)
+      throw new NotFoundException(EErrorMessage.QUIZ_NOT_FOUND);
+    return existingQuizz;
+  }
+
+  async findDaily(memberId: string): Promise<ResponseQuizzesOfMember> {
+    const date = new Date();
+    const existingQuizz = await this.findOneByDate(date);
+
+    return await this.fillMemberInfoToQuiz(existingQuizz, memberId);
+  }
+
+  async findSinceNow(): Promise<IQuiz[]> {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+
+    const existingQuizzes = await this.findAllBefore(date);
+    return existingQuizzes;
+  }
+
+  async findOfMember(memberId: string): Promise<ResponseQuizzesOfMember[]> {
+    const quizByNow = await this.findSinceNow();
+    const quizzes = await Promise.all(
+      quizByNow.map(
+        async (quiz) => await this.fillMemberInfoToQuiz(quiz, memberId),
+      ),
+    );
+
+    return quizzes;
+  }
+
+  async fillMemberInfoToQuiz(
+    quiz: IQuiz,
+    memberId: string,
+  ): Promise<ResponseQuizzesOfMember> {
+    const {
+      _id,
+      title,
+      description,
+      startDate,
+      deadline,
+      isPublished,
+      creationDate,
+      questionsIds,
+    } = quiz;
+    const maxScore = await this.getMaxScores(questionsIds);
+
+    const answerHistory = await this.findInHistory(
+      quiz._id.toString(),
+      memberId,
+    );
+    const isCompleted = !!answerHistory;
+    const totalScore = answerHistory?.score;
+
+    return {
+      _id,
+      title,
+      description,
+      startDate,
+      deadline,
+      isPublished,
+      creationDate,
+      numberOfQuestions: questionsIds.length,
+      totalScore,
+      maxScore,
+      isCompleted,
+      status: getQuizStatus(quiz),
+    };
+  }
+
+  async getMaxScores(questionsIds: string[]) {
+    const scores = await Promise.all(
+      questionsIds.map((questionId) =>
+        this.questionsService.getQuestionScore(questionId),
+      ),
+    );
+    const maxScore = scores.reduce((total, score) => total + score, 0);
+    return maxScore;
   }
 
   async updateOne(id: string, UpdateQuizDto: UpdateQuizDto): Promise<IQuiz> {
     const updatedQuiz = await this.quizModel.findByIdAndUpdate(
       id,
       UpdateQuizDto,
+      {
+        new: true,
+      },
     );
     if (!updatedQuiz)
       throw new NotFoundException(EErrorMessage.UPDATED_QUIZ_NOT_FOUND);
@@ -80,71 +177,27 @@ export class QuizzesService {
     return deletedQuiz;
   }
 
-  async addOneQuestionToQuiz(
-    quizId: string,
-    quesiton: AddOneQuestionDto,
-  ): Promise<IQuiz> {
-    const existingQuiz = await this.quizModel.findById(quizId);
-    if (!existingQuiz)
-      throw new NotFoundException(EErrorMessage.QUIZ_NOT_FOUND);
-
-    if (this.verifyIfContainsQuestion(existingQuiz, quesiton.questionId))
-      throw new ConflictException(EErrorMessage.QUESTION_ALREADY_IN_THE_QUIZ);
-
-    existingQuiz.questions.push(quesiton.questionId);
-    return await existingQuiz.save();
-  }
-
-  async addManyQuestionsToQuiz(
-    quizId: string,
-    addManyQuestionsDto: AddManyQuestionDto,
-  ): Promise<IQuiz> {
-    7;
-    const existingQuiz = await this.quizModel.findById(quizId);
-    if (!existingQuiz)
-      throw new NotFoundException(EErrorMessage.QUIZ_NOT_FOUND);
-
-    const { questionsIds } = addManyQuestionsDto;
-
-    if (this.verifyIfContainsQuestions(existingQuiz, questionsIds))
-      throw new ConflictException(EErrorMessage.QUESTIONS_ALREADY_IN_THE_QUIZ);
-
-    existingQuiz.questions.push(...questionsIds);
-    return await existingQuiz.save();
-  }
-
-  async removeQuestionToQuiz(quizId: string, questionId: string) {
-    const existingQuiz = await this.quizModel.findById(quizId);
-    if (!existingQuiz)
-      throw new NotFoundException(EErrorMessage.QUIZ_NOT_FOUND);
-
-    if (!this.verifyIfContainsQuestion(existingQuiz, questionId))
-      throw new NotFoundException(EErrorMessage.QUESTIONS_NOT_FOUND);
-
-    existingQuiz.questions = existingQuiz.questions.filter(
-      (question) => question !== questionId,
-    );
-    return await existingQuiz.save();
-  }
-
   async evaluate(
-    id: string,
+    quizId: string,
     evaluateQuizDto: EvaluateQuizDto,
+    memberId: string,
   ): Promise<EvaluateQuizResponseDto> {
-    const existingQuiz = await this.quizModel.findById(id);
+    const existingQuiz = await this.quizModel.findById(quizId);
     if (!existingQuiz)
       throw new NotFoundException(EErrorMessage.QUIZ_NOT_FOUND);
 
-    const questionsIdsQuiz = existingQuiz.questions;
-    const answers = evaluateQuizDto.answersRecord;
+    if (await this.findInHistory(existingQuiz._id.toString(), memberId))
+      throw new BadRequestException(EErrorMessage.QUIZZ_ALREADY_TAKEN);
+
+    const questionsIdsQuiz = existingQuiz.questionsIds;
+    const answers = evaluateQuizDto.answers;
     const filteredAnswer = this.cleanAnswers(answers, questionsIdsQuiz);
     const score = await this.computeScore(answers);
-    const answersRecord = await this.createResponseAnswerRecord(filteredAnswer);
-    
+
     return {
-      ...evaluateQuizDto,
       score,
-      answersRecord
+      answersRecord: filteredAnswer,
+      quizId,
     };
   }
 
@@ -154,37 +207,70 @@ export class QuizzesService {
     for (const answer of answers) {
       const questionScore = await this.questionsService.checkAnswers(
         answer.questionId,
-        answer.answers,
+        answer.answersIds,
       );
       score += questionScore;
     }
 
-    return score
+    return score;
   }
 
-  async createResponseAnswerRecord(filteredAnswer: AnswerRecordDto[]): Promise<ResponseAnswerRecordDto[]> {
-    return Promise.all(
-        filteredAnswer.map(async (answer) => {
-            return {
-              questionId: answer.questionId,
-              answers: answer.answers,
-              correctAnswers: await this.questionsService.findCorrectAnswers(answer.questionId)
-            };
-        })
+  async findQuestionsOfQuiz(
+    quizId: string,
+    memberId: string,
+  ): Promise<ResponseQuestionOfQuizDto> {
+    const existingQuiz = await this.findOne(quizId);
+
+    const answerHistory = await this.findInHistory(quizId, memberId);
+    const questionsIds = existingQuiz.questionsIds;
+    let questions;
+    questions = answerHistory
+      ? await this.questionsService.findManyWithAnswer(questionsIds)
+      : await this.questionsService.findManyWithOutAnswer(questionsIds);
+    const maxScore = await this.getMaxScores(
+      questions.map((q: IQuestion) => q._id.toString()),
     );
+    const response: ResponseQuestionOfQuizDto = {
+      _id: quizId,
+      title: existingQuiz.title,
+      description: existingQuiz.description,
+      questions,
+      totalScore: answerHistory?.score,
+      maxScore,
+      isCompleted: !!answerHistory,
+      answersRecord: answerHistory?.answersRecord,
+    };
+    return response;
   }
-  
+
+  async findInHistory(quizId: string, memberId: string | Types.ObjectId) {
+    try {
+      const answersHistory =
+        await this.answerHistoryService.findQuizTakenByMember(quizId, memberId);
+
+      return answersHistory;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async getActiveQuizzesCount() {
+    return await this.quizModel.countDocuments({ isPublished: true });
+  }
+
   cleanAnswers(answers: AnswerRecordDto[], questionsIdsQuiz: string[]) {
-    return answers.filter((answer) => questionsIdsQuiz.includes(answer.questionId));
+    return answers.filter((answer) =>
+      questionsIdsQuiz.includes(answer.questionId),
+    );
   }
 
   verifyIfContainsQuestion(quiz: IQuiz, questionId: string): boolean {
-    const questions = quiz.questions;
+    const questions = quiz.questionsIds;
     return questions.includes(questionId);
   }
 
   verifyIfContainsQuestions(quiz: IQuiz, questionIds: string[]): boolean {
-    const questions = quiz.questions;
+    const questions = quiz.questionsIds;
     const questionsSet = new Set(questions.map((question) => question));
     return questionIds.every((id) => questionsSet.has(id));
   }

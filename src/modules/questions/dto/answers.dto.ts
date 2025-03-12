@@ -1,7 +1,11 @@
-import { IsString, IsNotEmpty, IsBoolean } from "class-validator";
-import { IAnswer } from "src/common";
+import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
+import { IAnswer } from 'src/common';
 
-export class AnswersOptions implements IAnswer {
+export class AnswersOptionsDto implements IAnswer {
+  @IsString()
+  @IsNotEmpty()
+  readonly id: string;
+
   @IsString()
   @IsNotEmpty()
   readonly text: string;

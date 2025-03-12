@@ -5,6 +5,9 @@ import { EQuestionType, IAnswer } from 'src/common';
 @Schema()
 class Answer implements IAnswer {
   @Prop({ required: true })
+  id: string;
+
+  @Prop({ required: true })
   text: string;
 
   @Prop({ required: true })

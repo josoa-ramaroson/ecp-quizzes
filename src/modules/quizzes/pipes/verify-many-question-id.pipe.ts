@@ -34,7 +34,7 @@ export class VerifyManyQuestionIdPipe implements PipeTransform {
     // #4 verify that every questionId exists in database
     // Fetch all requested questions in a single query
     const existingQuestions =
-      await this.questionsSerivice.findMany({questionsIds});
+      await this.questionsSerivice.findManyWithOutAnswer(questionsIds);
     if (existingQuestions.length !== questionsIds.length) {
       // Identify missing question IDs
       const existingIds = new Set(existingQuestions.map((q) => q.id));

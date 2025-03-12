@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { EErrorMessage, IAnswer, IQuestion } from 'src/common';
-import { UpdateQuestionDto, CreateQuestionDto, FindManyDto } from './dto';
-import { Model } from 'mongoose';
+import { UpdateQuestionDto, CreateQuestionDto } from './dto';
+import { Model, Types } from 'mongoose';
 import { Question } from './schemas';
 import { isSubArray } from 'src/utils';
+import { text } from 'stream/consumers';
 
 @Injectable()
 export class QuestionsService {
@@ -34,20 +35,31 @@ export class QuestionsService {
     return existingQuestion;
   }
 
-  async findMany(findManyDto: FindManyDto): Promise<IQuestion[]> {
+  async findManyWithAnswer(questionsIds: string[]): Promise<IQuestion[]> {
     const existingQuestion = await this.questionModel.find({
-      _id: { $in: findManyDto.questionsIds },
-    },
-    {
-      correctAnswers: 0,
-    }
-  );
+      _id: { $in: questionsIds },
+    });
+
     if (!existingQuestion)
       throw new NotFoundException(EErrorMessage.QUESTIONS_NOT_FOUND);
 
     return existingQuestion;
   }
 
+  async findManyWithOutAnswer(questionsIds: string[]): Promise<IQuestion[]> {
+    const existingQuestion = await this.questionModel.find({
+      _id: { $in: questionsIds },
+    });
+
+    if (!existingQuestion)
+      throw new NotFoundException(EErrorMessage.QUESTIONS_NOT_FOUND);
+
+    const answerFilteredQuestions = existingQuestion.map((question) =>
+      this.removeIsCorrectFromAnswers(question),
+    );
+
+    return answerFilteredQuestions;
+  }
 
   async updateOne(
     id: string,
@@ -56,6 +68,9 @@ export class QuestionsService {
     const updatedQuestion = await this.questionModel.findByIdAndUpdate(
       id,
       updateQuestionDto,
+      {
+        new: true,
+      },
     );
     if (!updatedQuestion)
       throw new NotFoundException(EErrorMessage.UPDATED_QUESTION_NOT_FOUND);
@@ -69,37 +84,56 @@ export class QuestionsService {
     return deletedQuestion;
   }
 
-  async checkAnswers(id: string, providedAnswers: string[]): Promise<number> {
+  async checkAnswers(
+    id: string,
+    providedAnswersIds: string[],
+  ): Promise<number> {
     // # 1 verify that it's a valid question from the database
     const existingQuestion = await this.questionModel.findById(id);
     if (!existingQuestion)
       throw new NotFoundException(EErrorMessage.QUESTION_NOT_FOUND);
     // #2 take correct answers from the found questions
+    // Take their Ids
     const answersOptions = existingQuestion.answersOptions;
-    const correctAnswers = answersOptions
-                              .filter((a) => a.isCorrect)
-                              .map((a) => a.text);
-  
+    const correctAnswersIds = answersOptions
+      .filter((a) => a.isCorrect)
+      .map((a) => a.id);
+
     // #3 default value to 0 for the score
     let score = 0;
 
     // #4 check if the answers are correct
-    //  if provided answers is not a subarray of the correctAnswer thro
-    if(isSubArray<string>(correctAnswers, providedAnswers))
-        if ( correctAnswers.length == providedAnswers.length )
-          score = existingQuestion.score;
-        else
-          score = Math.round(existingQuestion.score / 2);
+
+    if (isSubArray<string>(correctAnswersIds, providedAnswersIds))
+      if (correctAnswersIds.length == correctAnswersIds.length)
+        score = existingQuestion.score;
+      else score = Math.round(existingQuestion.score / 2);
     return score;
   }
 
-  async findCorrectAnswers(id: string): Promise<string[]> {
+  async findCorrectAnswersIds(id: string): Promise<string[]> {
     const existingQuestion = await this.questionModel.findById(id);
     if (!existingQuestion)
       throw new NotFoundException(EErrorMessage.QUESTION_NOT_FOUND);
-    const correctAnswers = existingQuestion.answersOptions
+    const correctAnswersIds = existingQuestion.answersOptions
       .filter((a) => a.isCorrect)
-      .map((a) => a.text);
-    return correctAnswers;
+      .map((a) => a.id);
+    return correctAnswersIds;
+  }
+
+  async getQuestionScore(id: string): Promise<number> {
+    const score = await this.questionModel.findById(id, { score: 1 });
+    if (!score) return 0;
+    return score.score;
+  }
+
+  removeIsCorrectFromAnswers(question: IQuestion) {
+    const answersOptions = question.answersOptions;
+    const newAnswersOptions = answersOptions.map((ans) => ({
+      id: ans.id,
+      text: ans.text,
+    }));
+    question.answersOptions = newAnswersOptions;
+    return question;
   }
 }

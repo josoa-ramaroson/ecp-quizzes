@@ -10,12 +10,10 @@ import { EErrorMessage } from 'src/common';
 
 @Injectable()
 export class AnswerRecordValidationPipe implements PipeTransform {
-  constructor(
-    private readonly questionsService: QuestionsService,
-  ) {}
+  constructor(private readonly questionsService: QuestionsService) {}
 
   async transform(value: EvaluateQuizDto, metadata: ArgumentMetadata) {
-    const answersRecord = value.answersRecord;
+    const answersRecord = value.answers;
     const questionIds = answersRecord.map((answer) => answer.questionId);
     await this.verifyQuestionsId(questionIds);
 
@@ -23,7 +21,8 @@ export class AnswerRecordValidationPipe implements PipeTransform {
   }
 
   async verifyQuestionsId(questionsIds: string[]) {
-    const questions = await this.questionsService.findMany({questionsIds});
+    const questions =
+      await this.questionsService.findManyWithOutAnswer(questionsIds);
     const foundQuestionIds = new Set(questions.map((q) => q._id.toString()));
 
     // Find missing question IDs

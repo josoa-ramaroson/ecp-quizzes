@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AnswerHistory } from './schemas';
 import { EErrorMessage, IAnswerHistory } from 'src/common';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateAnswerHistoryDto } from './dto';
 
 @Injectable()
@@ -39,6 +39,51 @@ export class AnswerHistoryService {
       memberId,
     });
     return foundAnswerHistory;
+  }
+
+  async findQuizTakenByMember(
+    quizId: string,
+    memberId: string | Types.ObjectId,
+  ): Promise<IAnswerHistory> {
+    const foundAnswerHistory = await this.answerHistoryModel.findOne({
+      memberId,
+      quizId,
+    });
+
+    if (!foundAnswerHistory)
+      throw new NotFoundException(EErrorMessage.ANSWER_HISTORY_NOT_FOUND);
+
+    return foundAnswerHistory;
+  }
+
+  async findQuizTakenByMemberFromADate(
+    memberId: string,
+    date: Date,
+  ): Promise<IAnswerHistory[]> {
+    const foundAnswerHistories = await this.answerHistoryModel.find({
+      memberId,
+      finishedAt: { $gte: date },
+    });
+
+    if (!foundAnswerHistories) return [];
+
+    return foundAnswerHistories;
+  }
+
+  async getNumberQuizInHistory(quizId: string) {
+    return this.answerHistoryModel.countDocuments({ quizId });
+  }
+
+  async countHistoryBetweenDate(startDate: Date, deadline: Date) {
+    startDate.setUTCHours(0,0,0,0)
+    deadline.setUTCHours(23,59,59,59)
+
+    return this.answerHistoryModel.countDocuments({
+      finishedAt: {
+        $ge: startDate,
+        $le: deadline,
+      }
+    })
   }
 
   remove(id: string) {

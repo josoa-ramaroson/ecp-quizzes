@@ -6,25 +6,15 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
-import {
-  AddManyQuestionDto,
-  AddOneQuestionDto,
-  CreateQuizDto,
-  EvaluateQuizDto,
-  UpdateQuizDto,
-} from './dto';
-import { 
-  AnswerRecordValidationPipe, 
-  VerifyOneQuestionIdPipe,
-  MemberIdValidationPipe,
-  ParseDatePipe,
- } from './pipes';
-import { VerifyManyQuestionIdPipe } from './pipes';
+import { CreateQuizDto, EvaluateQuizDto, UpdateQuizDto } from './dto';
+import { AnswerRecordValidationPipe, ParseDatePipe } from './pipes';
 import { AnswerHistoryInterceptor, ScoringInterceptor } from './interceptors';
-
+import { AuthenticatedRequest, EErrorMessage } from 'src/common';
 
 @Controller('quizzes')
 export class QuizzesController {
@@ -35,19 +25,38 @@ export class QuizzesController {
     return await this.quizzesService.findAll();
   }
 
+  @Get('daily')
+  async findDaily(@Req() req: AuthenticatedRequest) {
+    const memberId = req.user?.sub;
+    if (!memberId)
+      throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR);
+    return await this.quizzesService.findDaily(memberId);
+  }
+
   @Get('by-date/:date')
-  async findByDate(@Param("date", ParseDatePipe) date: Date) {
-    return await this.quizzesService.findByDate(date);
+  async findByDate(@Param('date', ParseDatePipe) date: Date) {
+    return await this.quizzesService.findAllByDate(date);
   }
 
   @Get('before/:date')
-  async findBefore(@Param("date", ParseDatePipe) date: Date) {
-    return await this.quizzesService.findBefore(date);
+  async findBefore(@Param('date', ParseDatePipe) date: Date) {
+    return await this.quizzesService.findAllBefore(date);
   }
-  
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.quizzesService.findOne(id);
+
+  @Get('of-member')
+  async findByNow(@Req() req: AuthenticatedRequest) {
+    const memberId = req.user?.sub;
+    if (!memberId)
+      throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR);
+    return await this.quizzesService.findOfMember(memberId);
+  }
+
+  @Get(':id/questions')
+  async findOne(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    const memberId = req.user?.sub;
+    if (!memberId)
+      throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR);
+    return await this.quizzesService.findQuestionsOfQuiz(id, memberId);
   }
 
   @Post()
@@ -68,43 +77,21 @@ export class QuizzesController {
     return await this.quizzesService.deleteOne(id);
   }
 
-  @Put(':id/question')
-  async addOneQuestionToQuiz(
-    @Param('id') quizId: string,
-    @Body(VerifyOneQuestionIdPipe) addOneQuestionDto: AddOneQuestionDto,
-  ) {
-    return await this.quizzesService.addOneQuestionToQuiz(
-      quizId,
-      addOneQuestionDto,
-    );
-  }
-
-  @Put(':id/questions')
-  async addManyQuestionsToQuiz(
-    @Param('id') quizId: string,
-    @Body(VerifyManyQuestionIdPipe) addManyQuestionsDto: AddManyQuestionDto,
-  ) {
-    return await this.quizzesService.addManyQuestionsToQuiz(
-      quizId,
-      addManyQuestionsDto,
-    );
-  }
-
   @Post(':id/evaluate')
   @UseInterceptors(ScoringInterceptor, AnswerHistoryInterceptor)
   async evaluate(
     @Param('id') id,
-    @Body(MemberIdValidationPipe, AnswerRecordValidationPipe)
+    @Body(AnswerRecordValidationPipe)
     evaluateQuizResponseDto: EvaluateQuizDto,
+    @Req() req: AuthenticatedRequest,
   ) {
-    return await this.quizzesService.evaluate(id, evaluateQuizResponseDto);
-  }
-
-  @Delete(':id/question/:questionId')
-  async removeOneQuestionFromQuiz(
-    @Param('id') quizId: string,
-    @Param('questionId') questionId: string,
-  ) {
-    return await this.quizzesService.removeQuestionToQuiz(quizId, questionId);
+    const memberId = req.user?.sub;
+    if (!memberId)
+      throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR);
+    return await this.quizzesService.evaluate(
+      id,
+      evaluateQuizResponseDto,
+      memberId,
+    );
   }
 }

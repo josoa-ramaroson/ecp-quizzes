@@ -1,13 +1,5 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Param, Delete } from '@nestjs/common';
 import { AnswerHistoryService } from './answer-history.service';
-
-import { MemberIdValidationPipe } from './pipes';
 
 @Controller('answer-history')
 export class AnswerHistoryController {
@@ -21,11 +13,6 @@ export class AnswerHistoryController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.answerHistoryService.findOne(id);
-  }
-
-  @Get('by-member')
-  findByMember(@Query('memberId', MemberIdValidationPipe) memberId: string) {
-    return this.answerHistoryService.findByMember(memberId);
   }
 
   @Delete(':id')

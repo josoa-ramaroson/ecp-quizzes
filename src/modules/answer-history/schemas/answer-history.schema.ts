@@ -5,27 +5,24 @@ import { Question } from 'src/modules/questions';
 import { Quiz } from 'src/modules/quizzes';
 
 @Schema({ _id: false })
-class AnswersRecord {
+export class AnswersRecord {
   @Prop({ type: Types.ObjectId, ref: Question.name, required: true })
   questionId: Types.ObjectId;
 
   @Prop({ type: [String], required: true })
-  answers: string[];
-
-  @Prop({ type: Boolean, required: true })
-  isCorrect: boolean;
+  answersIds: string[];
 }
 
 @Schema()
 export class AnswerHistory {
-  @Prop({ type: { type: Types.ObjectId, ref: Quiz.name, required: true } })
+  @Prop({ type: Types.ObjectId, ref: Quiz.name, required: true })
   quizId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: Quiz.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: Member.name, required: true })
   memberId: Types.ObjectId;
 
   @Prop({ type: [AnswersRecord], required: true })
-  answersRecord: AnswersRecord;
+  answersRecord: AnswersRecord[];
 
   @Prop({ required: true, default: new Date() })
   finishedAt: Date;

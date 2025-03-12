@@ -22,6 +22,7 @@ export class AuthService {
     const { email, password } = signInDto;
     const member = await this.memberService.findOneByEmail(email);
     const hashedPassword = member.password;
+
     const isAuthenticated = await this.hashingService.verifyPassword(
       password,
       hashedPassword,
@@ -32,7 +33,7 @@ export class AuthService {
     const payload = { email: member.email, sub: member.id, role: member.role };
 
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      accessToken: await this.jwtService.signAsync(payload),
     };
   }
 }

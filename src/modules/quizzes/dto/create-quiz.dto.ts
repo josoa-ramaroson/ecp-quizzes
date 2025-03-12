@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDateString,
   IsNotEmpty,
   IsOptional,
@@ -24,4 +25,8 @@ export class CreateQuizDto {
   @IsDateString()
   @IsNotEmpty()
   readonly deadline: Date;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  readonly isPublished: boolean;
 }

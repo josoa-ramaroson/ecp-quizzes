@@ -1,11 +1,7 @@
-import { AnswerRecordDto, EvaluateQuizDto } from './evaluate-quiz.dto';
+import { AnswerRecordDto } from './evaluate-quiz.dto';
 
-export class EvaluateQuizResponseDto extends EvaluateQuizDto {
+export class EvaluateQuizResponseDto {
   score: number;
-  answersRecord: ResponseAnswerRecordDto[];
+  answersRecord: AnswerRecordDto[];
+  quizId: string;
 }
-
-export class ResponseAnswerRecordDto extends AnswerRecordDto {
-  correctAnswers: string[];
-}
-

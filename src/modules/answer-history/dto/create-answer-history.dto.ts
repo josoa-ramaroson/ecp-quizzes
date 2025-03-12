@@ -16,10 +16,7 @@ class AnswerRecordDto {
 
   @IsArray()
   @IsNotEmpty({ each: true })
-  answers: string[];
-
-  @IsOptional()
-  isCorrect: boolean;
+  answersIds: string[];
 }
 
 export class CreateAnswerHistoryDto {
@@ -27,6 +24,11 @@ export class CreateAnswerHistoryDto {
   @IsNotEmpty()
   @IsMongoId()
   memberId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsMongoId()
+  quizId: string;
 
   @IsArray()
   @ValidateNested({ each: true })

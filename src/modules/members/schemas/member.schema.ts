@@ -12,7 +12,7 @@ export class Member {
   @Prop({ required: true })
   facebookName: string;
 
-  @Prop({ required: false, default: EMemberRole.APPRENTICE })
+  @Prop({ required: false, default: EMemberRole.MEMBER })
   role: EMemberRole;
 
   @Prop({ required: true })

@@ -20,7 +20,7 @@ export class VerifyOneQuestionIdPipe implements PipeTransform {
   ): Promise<AddOneQuestionDto> {
     // # 1 : verify the existance of questionId
     if (!value?.questionId)
-      throw new BadRequestException(EErrorMessage.MISSING_QUESTION_ID_ERROR)!;
+      throw new BadRequestException(EErrorMessage.MISSING_QUESTION_ID_ERROR);
     // # 2 verify the data types
     if (typeof value?.questionId !== 'string')
       throw new BadRequestException(EErrorMessage.INVALID_QUESTION_ID_ERROR);

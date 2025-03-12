@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NestInterceptor,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { AnswerHistoryService } from 'src/modules/answer-history/answer-history.service';
@@ -17,13 +18,19 @@ export class AnswerHistoryInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
-    const ctx = context.switchToHttp();
+    const request = context.switchToHttp().getRequest();
+    const memberId = request.user?.sub;
+
+    if (!memberId) {
+      throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR);
+    }
 
     return next.handle().pipe(
       map(async (data: EvaluateQuizResponseDto) => {
         try {
-          const answerHistory = await this.answerHistoryService.create(data);
+          await this.answerHistoryService.create({ ...data, memberId });
         } catch (error) {
+          console.error(error);
           throw new InternalServerErrorException(
             EErrorMessage.INTERNAL_SERVER_ERROR,
           );

@@ -5,4 +5,5 @@ export * from './question.interface';
 export * from './quiz.interface';
 export * from './answer-history.interface';
 export * from './answer-record.interface';
-export * from "./answer.interface"
+export * from './answer.interface';
+export * from './authenticated-request.interface';

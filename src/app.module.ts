@@ -14,6 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { QuizzesModule } from './modules/quizzes/quizzes.module';
 import { AuthModule } from './auth/auth.module';
 import { AnswerHistoryModule } from './modules/answer-history/answer-history.module';
+import { StatsModule } from './modules/stats/stats.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AnswerHistoryModule } from './modules/answer-history/answer-history.mod
     QuizzesModule,
     AuthModule,
     AnswerHistoryModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
