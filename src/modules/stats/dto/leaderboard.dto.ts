@@ -1,5 +1,5 @@
 export class LeaderBoardDto {
-  firstName: string;
+  pseudo: string;
   rank: number;
   score: number;
   memberId: string;

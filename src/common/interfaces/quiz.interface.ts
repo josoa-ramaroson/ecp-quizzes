@@ -9,4 +9,5 @@ export interface IQuiz extends Document {
   questionsIds: string[];
   creationDate: Date;
   isPublished: boolean;
+  isDaily: boolean;
 }

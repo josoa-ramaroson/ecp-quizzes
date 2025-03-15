@@ -3,11 +3,12 @@ import { EMemberRole } from '../enums';
 
 export interface IMember extends Document {
   _id: Types.ObjectId;
-  email: string;
+  pseudo: string;
   firstName: string;
   facebookName: string;
   role: EMemberRole;
   password: string;
   totalScore: number;
   rank?: number;
+  hasPasswordChanged: boolean;
 }

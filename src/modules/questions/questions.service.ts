@@ -127,6 +127,16 @@ export class QuestionsService {
     return score.score;
   }
 
+    async getTotalQuestionsScore(questionsIds: string[]) {
+      const scores = await Promise.all(
+        questionsIds.map((questionId) =>
+          this.getQuestionScore(questionId),
+        ),
+      );
+      const maxScore = scores.reduce((total, score) => total + score, 0);
+      return maxScore;
+    }
+
   removeIsCorrectFromAnswers(question: IQuestion) {
     const answersOptions = question.answersOptions;
     const newAnswersOptions = answersOptions.map((ans) => ({

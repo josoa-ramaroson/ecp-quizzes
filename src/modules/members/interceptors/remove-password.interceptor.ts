@@ -21,7 +21,7 @@ export class RemovePasswordInterceptor implements NestInterceptor {
             return data.map((item: IMember) => {
               return {
                 _id: item._id,
-                email: item.email,
+                pseudo: item.pseudo,
                 firstName: item.firstName,
                 facebookName: item.facebookName,
                 role: item.role,
@@ -30,7 +30,7 @@ export class RemovePasswordInterceptor implements NestInterceptor {
           } else if (typeof data == 'object') {
             return {
               _id: data._id,
-              email: data.email,
+              pseudo: data.pseudo,
               firstName: data.firstName,
               facebookName: data.facebookName,
               role: data.role,

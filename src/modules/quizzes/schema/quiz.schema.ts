@@ -24,6 +24,9 @@ export class Quiz {
 
   @Prop({ default: false })
   isPublished: boolean;
+
+  @Prop({ default: false })
+  isDaily: boolean;
 }
 
 export const QuizSchema = SchemaFactory.createForClass(Quiz);

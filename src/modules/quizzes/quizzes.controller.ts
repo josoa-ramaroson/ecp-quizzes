@@ -51,6 +51,11 @@ export class QuizzesController {
     return await this.quizzesService.findOfMember(memberId);
   }
 
+  @Get('upcoming')
+  async findUpComing() {
+    return await this.quizzesService.findUpComing();
+  }
+
   @Get(':id/questions')
   async findOne(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     const memberId = req.user?.sub;

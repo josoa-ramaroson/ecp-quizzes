@@ -1,14 +1,12 @@
 import {
   Inject,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { C_HASHING_SERVICE, EErrorMessage, IHashingService } from 'src/common';
+import { C_HASHING_SERVICE, EErrorMessage, EMemberRole, IHashingService } from 'src/common';
 import { MembersService } from 'src/modules/members/members.service';
 import { SignInDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
-import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -18,9 +16,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signIn(signInDto: SignInDto): Promise<any> {
-    const { email, password } = signInDto;
-    const member = await this.memberService.findOneByEmail(email);
+  async memberSignIn(signInDto: SignInDto): Promise<any> {
+    const { pseudo, password } = signInDto;
+    const member = await this.memberService.findOneByPseudo(pseudo);
     const hashedPassword = member.password;
 
     const isAuthenticated = await this.hashingService.verifyPassword(
@@ -30,7 +28,26 @@ export class AuthService {
 
     if (!isAuthenticated) throw new UnauthorizedException();
 
-    const payload = { email: member.email, sub: member.id, role: member.role };
+    const payload = { pseudo: member.pseudo, sub: member.id, role: member.role };
+
+    return {
+      accessToken: await this.jwtService.signAsync(payload),
+    };
+  }
+
+  async moderatorSignIn(signInDto: SignInDto): Promise<any> {
+    const { pseudo, password } = signInDto;
+    const moderator = await this.memberService.findOneByPseudo(pseudo);
+    const hashedPassword = moderator.password;
+
+    const isAuthenticated = await this.hashingService.verifyPassword(
+      password,
+      hashedPassword,
+    );
+
+    if (!isAuthenticated && (moderator.role != EMemberRole.MODERATOR)) throw new UnauthorizedException(EErrorMessage.UNAUTHORIZED_ERROR);
+
+    const payload = { pseudo: moderator.pseudo, sub: moderator.id, role: moderator.role };
 
     return {
       accessToken: await this.jwtService.signAsync(payload),

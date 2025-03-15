@@ -3,11 +3,12 @@ import { EMemberRole } from 'src/common';
 
 @Schema()
 export class Member {
-  @Prop({ required: true })
-  email: string;
 
   @Prop({ required: true })
   firstName: string;
+
+  @Prop({ required: true })
+  pseudo: string;
 
   @Prop({ required: true })
   facebookName: string;
@@ -20,6 +21,9 @@ export class Member {
 
   @Prop()
   totalScore: number;
+
+  @Prop({ default: false })
+  hasPasswordChanged: boolean
 }
 
 export const MemberSchema = SchemaFactory.createForClass(Member);

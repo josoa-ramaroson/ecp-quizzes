@@ -8,9 +8,16 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
-  @Post('login')
+  @Post('member/sign-in')
   @PublicRoutes()
-  async signIn(@Body() signInDto: SignInDto) {
-    return await this.authService.signIn(signInDto);
+  async memberSignIn(@Body() signInDto: SignInDto) {
+    return await this.authService.memberSignIn(signInDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('moderator/sign-in')
+  @PublicRoutes()
+  async moderatorSignIn(@Body() signInDto: SignInDto) {
+    return await this.authService.moderatorSignIn(signInDto);
   }
 }

@@ -74,14 +74,19 @@ export class AnswerHistoryService {
     return this.answerHistoryModel.countDocuments({ quizId });
   }
 
+
+  async countQuizTakenByMember(memberId: string){
+    return this.answerHistoryModel.countDocuments({memberId})
+  }
+
   async countHistoryBetweenDate(startDate: Date, deadline: Date) {
     startDate.setUTCHours(0,0,0,0)
     deadline.setUTCHours(23,59,59,59)
 
     return this.answerHistoryModel.countDocuments({
       finishedAt: {
-        $ge: startDate,
-        $le: deadline,
+        $gte: startDate,
+        $lte: deadline,
       }
     })
   }

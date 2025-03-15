@@ -6,15 +6,18 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
 import { MembersService } from './members.service';
-import { CreateMemberDto } from './dto';
+import { CreateMemberDto, UpdateMemberProfileDto } from './dto';
 import {
   HashPasswordInterceptor,
   RemovePasswordInterceptor,
 } from './interceptors';
 import { UpdateMemberDto } from './dto';
+import { AuthenticatedRequest, EErrorMessage } from 'src/common';
 
 @Controller('members')
 export class MembersController {
@@ -34,6 +37,18 @@ export class MembersController {
   @UseInterceptors(HashPasswordInterceptor)
   async createOne(@Body() createMemberDto: CreateMemberDto) {
     return await this.memberService.createOne(createMemberDto);
+  }
+
+  @Put("profile")
+  @UseInterceptors(HashPasswordInterceptor)
+  async updateProfile(
+    @Body() updateMemberProfileDto: UpdateMemberProfileDto,
+    @Req() req: AuthenticatedRequest
+) {
+    const memberId = req.user?.sub;
+      if (!memberId)
+        throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR );
+    return await this.memberService.updateProfile(memberId, updateMemberProfileDto);
   }
 
   @Put(':id')

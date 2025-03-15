@@ -37,7 +37,7 @@ export class QuizzesService {
     return await this.quizModel.find();
   }
 
-  async findOne(id: string): Promise<IQuiz> {
+  async findOne(id: string | Types.ObjectId): Promise<IQuiz> {
     const existingQuizz = await this.quizModel.findById(id);
 
     if (!existingQuizz)
@@ -56,7 +56,7 @@ export class QuizzesService {
     return existingQuizz;
   }
 
-  async findOneByDate(date: Date): Promise<IQuiz> {
+  async findOneByDate(date: Date, filter?:Record<string,string | boolean | number>): Promise<IQuiz> {
     date.setUTCHours(0, 0, 0, 0);
     const deadline = new Date(date);
     deadline.setUTCDate(deadline.getDate() + 1);
@@ -65,6 +65,7 @@ export class QuizzesService {
       startDate: { $gte: date },
       deadline: { $lte: deadline },
       isPublished: true,
+      ...filter
     });
 
     if (!existingQuizz)
@@ -73,8 +74,23 @@ export class QuizzesService {
   }
 
   async findAllBefore(date: Date): Promise<IQuiz[]> {
+    const queryDate = new Date(date);
+    queryDate.setUTCHours(23, 59, 59, 999);
     const existingQuizz = await this.quizModel.find({
-      startDate: { $lte: date.setHours(23, 59, 59) },
+      startDate: { $lte: queryDate },
+      isPublished: true,
+    });
+
+    if (!existingQuizz)
+      throw new NotFoundException(EErrorMessage.QUIZ_NOT_FOUND);
+    return existingQuizz;
+  }
+
+  async findAllAfter(date: Date): Promise<IQuiz[]> {
+    const queryDate = new Date(date);
+    queryDate.setUTCHours(23,59,59,59);
+    const existingQuizz = await this.quizModel.find({
+      startDate: { $gte: queryDate },
       isPublished: true,
     });
 
@@ -85,7 +101,7 @@ export class QuizzesService {
 
   async findDaily(memberId: string): Promise<ResponseQuizzesOfMember> {
     const date = new Date();
-    const existingQuizz = await this.findOneByDate(date);
+    const existingQuizz = await this.findOneByDate(date, { isDaily: true });
 
     return await this.fillMemberInfoToQuiz(existingQuizz, memberId);
   }
@@ -96,6 +112,11 @@ export class QuizzesService {
 
     const existingQuizzes = await this.findAllBefore(date);
     return existingQuizzes;
+  }
+
+  async findUpComing(): Promise<IQuiz[]> {
+    const today = new Date();
+    return await this.findAllAfter(today);
   }
 
   async findOfMember(memberId: string): Promise<ResponseQuizzesOfMember[]> {
@@ -123,7 +144,7 @@ export class QuizzesService {
       creationDate,
       questionsIds,
     } = quiz;
-    const maxScore = await this.getMaxScores(questionsIds);
+    const maxScore = await this.questionsService.getTotalQuestionsScore(questionsIds);
 
     const answerHistory = await this.findInHistory(
       quiz._id.toString(),
@@ -148,14 +169,13 @@ export class QuizzesService {
     };
   }
 
-  async getMaxScores(questionsIds: string[]) {
-    const scores = await Promise.all(
-      questionsIds.map((questionId) =>
-        this.questionsService.getQuestionScore(questionId),
-      ),
-    );
-    const maxScore = scores.reduce((total, score) => total + score, 0);
-    return maxScore;
+  async getQuizzesMaxScore(quizId: string | Types.ObjectId): Promise<number> {
+    try {
+      const quizzes = await this.findOne(quizId)
+      return await this.questionsService.getTotalQuestionsScore(quizzes.questionsIds);
+    } catch (error) {
+      return 0;
+    }
   }
 
   async updateOne(id: string, UpdateQuizDto: UpdateQuizDto): Promise<IQuiz> {
@@ -227,9 +247,11 @@ export class QuizzesService {
     questions = answerHistory
       ? await this.questionsService.findManyWithAnswer(questionsIds)
       : await this.questionsService.findManyWithOutAnswer(questionsIds);
-    const maxScore = await this.getMaxScores(
+    
+      const maxScore = await this.questionsService.getTotalQuestionsScore(
       questions.map((q: IQuestion) => q._id.toString()),
     );
+
     const response: ResponseQuestionOfQuizDto = {
       _id: quizId,
       title: existingQuiz.title,
