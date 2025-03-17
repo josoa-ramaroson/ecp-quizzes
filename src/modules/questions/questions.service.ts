@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { EErrorMessage, IAnswer, IQuestion } from 'src/common';
+import { EErrorMessage, IQuestion } from 'src/common';
 import { UpdateQuestionDto, CreateQuestionDto } from './dto';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Question } from './schemas';
 import { isSubArray } from 'src/utils';
-import { text } from 'stream/consumers';
 
 @Injectable()
 export class QuestionsService {
@@ -127,15 +126,13 @@ export class QuestionsService {
     return score.score;
   }
 
-    async getTotalQuestionsScore(questionsIds: string[]) {
-      const scores = await Promise.all(
-        questionsIds.map((questionId) =>
-          this.getQuestionScore(questionId),
-        ),
-      );
-      const maxScore = scores.reduce((total, score) => total + score, 0);
-      return maxScore;
-    }
+  async getTotalQuestionsScore(questionsIds: string[]) {
+    const scores = await Promise.all(
+      questionsIds.map((questionId) => this.getQuestionScore(questionId)),
+    );
+    const maxScore = scores.reduce((total, score) => total + score, 0);
+    return maxScore;
+  }
 
   removeIsCorrectFromAnswers(question: IQuestion) {
     const answersOptions = question.answersOptions;

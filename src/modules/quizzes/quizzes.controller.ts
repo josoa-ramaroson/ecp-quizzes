@@ -8,6 +8,7 @@ import {
   Put,
   Req,
   UnauthorizedException,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
@@ -15,8 +16,10 @@ import { CreateQuizDto, EvaluateQuizDto, UpdateQuizDto } from './dto';
 import { AnswerRecordValidationPipe, ParseDatePipe } from './pipes';
 import { AnswerHistoryInterceptor, ScoringInterceptor } from './interceptors';
 import { AuthenticatedRequest, EErrorMessage } from 'src/common';
+import { ActiveAccountGuard } from './guards';
 
 @Controller('quizzes')
+@UseGuards(ActiveAccountGuard)
 export class QuizzesController {
   constructor(private readonly quizzesService: QuizzesService) {}
 
@@ -69,19 +72,6 @@ export class QuizzesController {
     return await this.quizzesService.createOne(createQuizDto);
   }
 
-  @Put(':id')
-  async updateOne(
-    @Param('id') id: string,
-    @Body() updateQuizDto: UpdateQuizDto,
-  ) {
-    return await this.quizzesService.updateOne(id, updateQuizDto);
-  }
-
-  @Delete(':id')
-  async deleteOne(@Param('id') id: string) {
-    return await this.quizzesService.deleteOne(id);
-  }
-
   @Post(':id/evaluate')
   @UseInterceptors(ScoringInterceptor, AnswerHistoryInterceptor)
   async evaluate(
@@ -98,5 +88,23 @@ export class QuizzesController {
       evaluateQuizResponseDto,
       memberId,
     );
+  }
+
+  @Put(':id')
+  async updateOne(
+    @Param('id') id: string,
+    @Body() updateQuizDto: UpdateQuizDto,
+  ) {
+    return await this.quizzesService.updateOne(id, updateQuizDto);
+  }
+
+  @Delete('question/:questionId')
+  async deleteQuestionsFromQuiz(@Param('questionId') questionId: string) {
+    return await this.quizzesService.removeQuestionIdFromQuizzes(questionId);
+  }
+
+  @Delete(':id')
+  async deleteOne(@Param('id') id: string) {
+    return await this.quizzesService.deleteOne(id);
   }
 }

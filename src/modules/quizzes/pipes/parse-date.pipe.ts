@@ -1,14 +1,9 @@
-import {
-  ArgumentMetadata,
-  BadRequestException,
-  Injectable,
-  PipeTransform,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 import { EErrorMessage } from 'src/common';
 
 @Injectable()
 export class ParseDatePipe implements PipeTransform {
-  transform(value: string | number, metadata: ArgumentMetadata): Date {
+  transform(value: string | number): Date {
     const date = new Date(value);
 
     if (isNaN(date.getTime()))

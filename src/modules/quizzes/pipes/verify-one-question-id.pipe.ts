@@ -1,5 +1,4 @@
 import {
-  ArgumentMetadata,
   BadRequestException,
   Injectable,
   NotFoundException,
@@ -14,10 +13,7 @@ import { QuestionsService } from 'src/modules/questions';
 export class VerifyOneQuestionIdPipe implements PipeTransform {
   constructor(private readonly questionsService: QuestionsService) {}
 
-  async transform(
-    value: AddOneQuestionDto,
-    metadata: ArgumentMetadata,
-  ): Promise<AddOneQuestionDto> {
+  async transform(value: AddOneQuestionDto): Promise<AddOneQuestionDto> {
     // # 1 : verify the existance of questionId
     if (!value?.questionId)
       throw new BadRequestException(EErrorMessage.MISSING_QUESTION_ID_ERROR);

@@ -7,12 +7,7 @@ import { AnswerHistoryModule } from '../answer-history/answer-history.module';
 import { QuestionsModule } from '../questions';
 
 @Module({
-  imports: [
-    MembersModule,
-    QuizzesModule,
-    AnswerHistoryModule,
-    QuestionsModule,
-  ],
+  imports: [MembersModule, QuizzesModule, AnswerHistoryModule, QuestionsModule],
   providers: [StatsService],
   controllers: [StatsController],
 })

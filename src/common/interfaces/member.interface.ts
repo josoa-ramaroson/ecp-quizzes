@@ -11,4 +11,5 @@ export interface IMember extends Document {
   totalScore: number;
   rank?: number;
   hasPasswordChanged: boolean;
+  isActiveAccount: boolean;
 }

@@ -10,10 +10,7 @@ import { IMember } from 'src/common';
 
 @Injectable()
 export class RemovePasswordInterceptor implements NestInterceptor {
-  async intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Promise<Observable<any>> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data: IMember[] | IMember) => {
         if (data) {

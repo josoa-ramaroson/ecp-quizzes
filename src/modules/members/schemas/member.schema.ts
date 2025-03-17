@@ -3,7 +3,6 @@ import { EMemberRole } from 'src/common';
 
 @Schema()
 export class Member {
-
   @Prop({ required: true })
   firstName: string;
 
@@ -23,7 +22,10 @@ export class Member {
   totalScore: number;
 
   @Prop({ default: false })
-  hasPasswordChanged: boolean
+  hasPasswordChanged: boolean;
+
+  @Prop({ default: true })
+  isActiveAccount: boolean;
 }
 
 export const MemberSchema = SchemaFactory.createForClass(Member);

@@ -15,7 +15,7 @@ import { APP_GUARD } from '@nestjs/core';
     HashingModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         global: true,
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '3d' },
@@ -26,10 +26,10 @@ import { APP_GUARD } from '@nestjs/core';
   controllers: [AuthController],
   providers: [
     AuthService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard,
+    // },
   ],
 })
 export class AuthModule {}

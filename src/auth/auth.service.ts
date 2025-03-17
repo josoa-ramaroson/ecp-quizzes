@@ -1,9 +1,11 @@
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import {
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { C_HASHING_SERVICE, EErrorMessage, EMemberRole, IHashingService } from 'src/common';
+  C_HASHING_SERVICE,
+  EErrorMessage,
+  EMemberRole,
+  IAuthPayload,
+  IHashingService,
+} from 'src/common';
 import { MembersService } from 'src/modules/members/members.service';
 import { SignInDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
@@ -28,7 +30,11 @@ export class AuthService {
 
     if (!isAuthenticated) throw new UnauthorizedException();
 
-    const payload = { pseudo: member.pseudo, sub: member.id, role: member.role };
+    const payload: IAuthPayload = {
+      pseudo: member.pseudo,
+      sub: member._id.toString(),
+      role: member.role,
+    };
 
     return {
       accessToken: await this.jwtService.signAsync(payload),
@@ -45,9 +51,14 @@ export class AuthService {
       hashedPassword,
     );
 
-    if (!isAuthenticated && (moderator.role != EMemberRole.MODERATOR)) throw new UnauthorizedException(EErrorMessage.UNAUTHORIZED_ERROR);
+    if (!isAuthenticated && moderator.role != EMemberRole.MODERATOR)
+      throw new UnauthorizedException(EErrorMessage.UNAUTHORIZED_ERROR);
 
-    const payload = { pseudo: moderator.pseudo, sub: moderator.id, role: moderator.role };
+    const payload = {
+      pseudo: moderator.pseudo,
+      sub: moderator._id.toString(),
+      role: moderator.role,
+    };
 
     return {
       accessToken: await this.jwtService.signAsync(payload),

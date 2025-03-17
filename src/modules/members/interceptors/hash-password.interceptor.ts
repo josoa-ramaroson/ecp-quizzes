@@ -5,6 +5,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { C_HASHING_SERVICE, IHashingService } from 'src/common';
 
@@ -20,7 +21,7 @@ export class HashPasswordInterceptor implements NestInterceptor {
   ): Promise<Observable<any>> {
     const httpCtx = context.switchToHttp();
 
-    const request = httpCtx.getRequest();
+    const request: Request = httpCtx.getRequest();
 
     if (request.body?.password)
       request.body.password = await this.hashingService.hashPassword(

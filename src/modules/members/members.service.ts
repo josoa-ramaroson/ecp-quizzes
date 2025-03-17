@@ -7,7 +7,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Member } from './schemas';
 import { EErrorMessage, EMemberRole, IMember } from 'src/common';
-import { CreateMemberDto, UpdateMemberDto, UpdateMemberProfileDto } from './dto';
+import {
+  CreateMemberDto,
+  UpdateMemberDto,
+  UpdateMemberProfileDto,
+} from './dto';
 
 @Injectable()
 export class MembersService {
@@ -36,7 +40,10 @@ export class MembersService {
   }
 
   async findAllMember(role: EMemberRole) {
-    const existingMember = await this.memberModel.find({ role: role }, { password: 0 });
+    const existingMember = await this.memberModel.find(
+      { role: role },
+      { password: 0 },
+    );
     return existingMember;
   }
 
@@ -57,64 +64,6 @@ export class MembersService {
     return existingMember;
   }
 
-  async updateOne(
-    id: string,
-    updateMemberDto: UpdateMemberDto,
-  ): Promise<IMember> {
-    const updatedMember = await this.memberModel.findByIdAndUpdate(
-      id,
-      updateMemberDto,
-      {
-        new: true,
-        select: { password: 0 },
-      },
-    );
-    if (!updatedMember)
-      throw new NotFoundException(EErrorMessage.UPDATED_MEMBER_NOT_FOUND);
-    return updatedMember;
-  }
-
-  async updateProfile(memberId:string,memberData: UpdateMemberProfileDto) {
-    
-    const updateData = {
-      firstName: memberData.firstName,
-      facebookName: memberData.facebookName,
-      pseudo: memberData.pseudo,
-    };
-
-    if (memberData.password) {
-      updateData['password'] = memberData.password;
-      updateData["hasPasswordChanged"] = true;
-    }
-
-    const existingPseudo = await this.memberModel.findOne({
-      pseudo: memberData.pseudo,
-    }); 
-    console.log(memberId);
-    console.log(existingPseudo);
-    if (existingPseudo && existingPseudo._id.toString() !== memberId)
-      throw new ConflictException(EErrorMessage.MEMBER_PSEUDO_ALREADY_USED);
-
-    const updatedMember = await this.memberModel.findByIdAndUpdate(
-      memberId,
-      updateData,
-      {
-        new: true,
-        select: { password: 0 },
-      },
-    );
-    
-    if (!updatedMember)
-      throw new NotFoundException(EErrorMessage.UPDATED_MEMBER_NOT_FOUND);
-    return updatedMember;
-  }
-  
-  async deleteOne(id: string): Promise<IMember> {
-    const deletedMember = await this.memberModel.findByIdAndDelete(id);
-    if (!deletedMember)
-      throw new NotFoundException(EErrorMessage.MEMBER_NOT_FOUND);
-    return deletedMember;
-  }
 
   async getMembersRanking() {
     const members = await this.memberModel.find({}, { password: 0 });
@@ -136,4 +85,63 @@ export class MembersService {
   async getTotalCount() {
     return await this.memberModel.countDocuments();
   }
+
+  async updateOne(
+    id: string,
+    updateMemberDto: UpdateMemberDto,
+  ): Promise<IMember> {
+    const updatedMember = await this.memberModel.findByIdAndUpdate(
+      id,
+      updateMemberDto,
+      {
+        new: true,
+        select: { password: 0 },
+      },
+    );
+    if (!updatedMember)
+      throw new NotFoundException(EErrorMessage.UPDATED_MEMBER_NOT_FOUND);
+    return updatedMember;
+  }
+
+  async updateProfile(memberId: string, memberData: UpdateMemberProfileDto) {
+    const updateData = {
+      firstName: memberData.firstName,
+      facebookName: memberData.facebookName,
+      pseudo: memberData.pseudo,
+    };
+
+    if (memberData.password) {
+      updateData['password'] = memberData.password;
+      updateData['hasPasswordChanged'] = true;
+    }
+
+    const existingPseudo = await this.memberModel.findOne({
+      pseudo: memberData.pseudo,
+    });
+    console.log(memberId);
+    console.log(existingPseudo);
+    if (existingPseudo && existingPseudo._id.toString() !== memberId)
+      throw new ConflictException(EErrorMessage.MEMBER_PSEUDO_ALREADY_USED);
+
+    const updatedMember = await this.memberModel.findByIdAndUpdate(
+      memberId,
+      updateData,
+      {
+        new: true,
+        select: { password: 0 },
+      },
+    );
+
+    if (!updatedMember)
+      throw new NotFoundException(EErrorMessage.UPDATED_MEMBER_NOT_FOUND);
+    return updatedMember;
+  }
+
+  async deleteOne(id: string): Promise<IMember> {
+    const deletedMember = await this.memberModel.findByIdAndDelete(id);
+    if (!deletedMember)
+      throw new NotFoundException(EErrorMessage.MEMBER_NOT_FOUND);
+    return deletedMember;
+  }
+
 }

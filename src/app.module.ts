@@ -1,4 +1,4 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import * as Joi from 'joi';
@@ -28,7 +28,7 @@ import { StatsModule } from './modules/stats/stats.module';
 
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('MONGODB_URI'),
         dbName: configService.get<string>('DATABASE_NAME'),
       }),

@@ -29,7 +29,6 @@ export class QuestionsController {
     return this.questionService.findAll();
   }
 
-
   @Get(':id')
   @UseInterceptors(RemoveCorrectAnswerInterceptor)
   async findOne(@Param('id') id: string) {

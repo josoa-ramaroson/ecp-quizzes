@@ -5,33 +5,25 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { EErrorMessage, IAuthPayload, IS_PUBLIC_ROUTE } from 'src/common';
+import { EErrorMessage, IAuthPayload } from 'src/common';
+import { MembersService } from 'src/modules/members';
 import { extractTokenFromHeader } from 'src/utils';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class ActiveAccountGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
-    private reflector: Reflector
+    private membersService: MembersService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
-      IS_PUBLIC_ROUTE,
-      [context.getHandler(), context.getClass()],
-    );
-
-    if (isPublicRoute) return true;
-
-    const request: Request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest();
     const token = extractTokenFromHeader(request);
     const payload = await this.verifyToken(token);
-    request["user"] = payload;
-    return true;
+    return await this.verifyActiveAccount(payload);
   }
 
   private async verifyToken(token: string | undefined): Promise<IAuthPayload> {
@@ -42,10 +34,16 @@ export class AuthGuard implements CanActivate {
       const payload: IAuthPayload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
+
       return payload;
     } catch {
       throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR);
     }
   }
 
+  private async verifyActiveAccount(payload: IAuthPayload): Promise<boolean> {
+    const existingMember = await this.membersService.findOne(payload.sub);
+    return existingMember.isActiveAccount;
+  }
+  
 }

@@ -35,10 +35,7 @@ export class ScoringInterceptor implements NestInterceptor {
         const memberDocument = await this.membersService.findOne(memberId);
         if (memberDocument) memberDocument.totalScore += score;
 
-        const updated = await this.membersService.updateOne(
-          memberId,
-          memberDocument,
-        );
+        await this.membersService.updateOne(memberId, memberDocument);
         return data;
       }),
     );

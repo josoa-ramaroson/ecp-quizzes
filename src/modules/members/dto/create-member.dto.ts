@@ -8,12 +8,11 @@ import {
 import { EMemberRole } from 'src/common';
 
 export class CreateMemberDto {
-
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   readonly firstName: string;
- 
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)

@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
 import { EQuestionType, IAnswer } from 'src/common';
 
 @Schema()

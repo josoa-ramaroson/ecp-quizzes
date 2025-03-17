@@ -3,4 +3,4 @@ export class MonthlyQuizCompletionDto {
   completions: number;
 }
 
-export type TMonthlyNameDto = "Week 1" | "Week 2" | "Week 3" | "Week 4"
+export type TMonthlyNameDto = 'Week 1' | 'Week 2' | 'Week 3' | 'Week 4';

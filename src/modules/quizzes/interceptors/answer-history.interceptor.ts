@@ -9,7 +9,7 @@ import {
 import { map, Observable } from 'rxjs';
 import { AnswerHistoryService } from 'src/modules/answer-history/answer-history.service';
 import { EvaluateQuizResponseDto } from '../dto';
-import { EErrorMessage, IAnswerHistory } from 'src/common';
+import { EErrorMessage } from 'src/common';
 
 @Injectable()
 export class AnswerHistoryInterceptor implements NestInterceptor {

@@ -1,9 +1,4 @@
-import {
-  ArgumentMetadata,
-  BadRequestException,
-  Injectable,
-  PipeTransform,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 import { QuestionsService } from 'src/modules/questions';
 import { EvaluateQuizDto } from '../dto';
 import { EErrorMessage } from 'src/common';
@@ -12,7 +7,7 @@ import { EErrorMessage } from 'src/common';
 export class AnswerRecordValidationPipe implements PipeTransform {
   constructor(private readonly questionsService: QuestionsService) {}
 
-  async transform(value: EvaluateQuizDto, metadata: ArgumentMetadata) {
+  async transform(value: EvaluateQuizDto) {
     const answersRecord = value.answers;
     const questionIds = answersRecord.map((answer) => answer.questionId);
     await this.verifyQuestionsId(questionIds);

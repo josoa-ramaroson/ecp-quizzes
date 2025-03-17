@@ -39,16 +39,19 @@ export class MembersController {
     return await this.memberService.createOne(createMemberDto);
   }
 
-  @Put("profile")
+  @Put('profile')
   @UseInterceptors(HashPasswordInterceptor)
   async updateProfile(
     @Body() updateMemberProfileDto: UpdateMemberProfileDto,
-    @Req() req: AuthenticatedRequest
-) {
+    @Req() req: AuthenticatedRequest,
+  ) {
     const memberId = req.user?.sub;
-      if (!memberId)
-        throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR );
-    return await this.memberService.updateProfile(memberId, updateMemberProfileDto);
+    if (!memberId)
+      throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR);
+    return await this.memberService.updateProfile(
+      memberId,
+      updateMemberProfileDto,
+    );
   }
 
   @Put(':id')

@@ -1,12 +1,8 @@
 import { Type } from 'class-transformer';
 import {
-  ArrayContains,
   ArrayNotEmpty,
   IsArray,
-  IsBoolean,
   IsEnum,
-  IsInstance,
-  isInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,

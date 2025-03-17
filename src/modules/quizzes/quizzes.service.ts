@@ -56,7 +56,10 @@ export class QuizzesService {
     return existingQuizz;
   }
 
-  async findOneByDate(date: Date, filter?:Record<string,string | boolean | number>): Promise<IQuiz> {
+  async findOneByDate(
+    date: Date,
+    filter?: Record<string, string | boolean | number>,
+  ): Promise<IQuiz> {
     date.setUTCHours(0, 0, 0, 0);
     const deadline = new Date(date);
     deadline.setUTCDate(deadline.getDate() + 1);
@@ -65,7 +68,7 @@ export class QuizzesService {
       startDate: { $gte: date },
       deadline: { $lte: deadline },
       isPublished: true,
-      ...filter
+      ...filter,
     });
 
     if (!existingQuizz)
@@ -88,7 +91,7 @@ export class QuizzesService {
 
   async findAllAfter(date: Date): Promise<IQuiz[]> {
     const queryDate = new Date(date);
-    queryDate.setUTCHours(23,59,59,59);
+    queryDate.setUTCHours(23, 59, 59, 59);
     const existingQuizz = await this.quizModel.find({
       startDate: { $gte: queryDate },
       isPublished: true,
@@ -144,7 +147,8 @@ export class QuizzesService {
       creationDate,
       questionsIds,
     } = quiz;
-    const maxScore = await this.questionsService.getTotalQuestionsScore(questionsIds);
+    const maxScore =
+      await this.questionsService.getTotalQuestionsScore(questionsIds);
 
     const answerHistory = await this.findInHistory(
       quiz._id.toString(),
@@ -171,9 +175,11 @@ export class QuizzesService {
 
   async getQuizzesMaxScore(quizId: string | Types.ObjectId): Promise<number> {
     try {
-      const quizzes = await this.findOne(quizId)
-      return await this.questionsService.getTotalQuestionsScore(quizzes.questionsIds);
-    } catch (error) {
+      const quizzes = await this.findOne(quizId);
+      return await this.questionsService.getTotalQuestionsScore(
+        quizzes.questionsIds,
+      );
+    } catch {
       return 0;
     }
   }
@@ -243,12 +249,11 @@ export class QuizzesService {
 
     const answerHistory = await this.findInHistory(quizId, memberId);
     const questionsIds = existingQuiz.questionsIds;
-    let questions;
-    questions = answerHistory
+    const questions = answerHistory
       ? await this.questionsService.findManyWithAnswer(questionsIds)
       : await this.questionsService.findManyWithOutAnswer(questionsIds);
-    
-      const maxScore = await this.questionsService.getTotalQuestionsScore(
+
+    const maxScore = await this.questionsService.getTotalQuestionsScore(
       questions.map((q: IQuestion) => q._id.toString()),
     );
 
@@ -271,9 +276,31 @@ export class QuizzesService {
         await this.answerHistoryService.findQuizTakenByMember(quizId, memberId);
 
       return answersHistory;
-    } catch (error) {
+    } catch {
       return null;
     }
+  }
+
+  async removeQuestionIdFromQuizzes(questionId: string) {
+    const quizzesContainingQuestion =
+      await this.findQuizContainingQuestion(questionId);
+    await Promise.all(
+      quizzesContainingQuestion.map(async (q) => {
+        const questionIds = q.questionsIds;
+        q.questionsIds = questionIds.filter((id) => id != questionId);
+        await q.save();
+      }),
+    );
+    return { message: 'Question removed' };
+  }
+
+  async findQuizContainingQuestion(questionId: string): Promise<IQuiz[]> {
+    const quizzes = await this.quizModel.find({
+      questionsIds: { $elemMatch: { $eq: questionId } },
+    });
+
+    if (!quizzes) return [];
+    return quizzes;
   }
 
   async getActiveQuizzesCount() {

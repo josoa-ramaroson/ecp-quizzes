@@ -30,21 +30,21 @@ export class StatsController {
     return this.statsService.getTopPerformerMember();
   }
 
-  @Get("monthly-completion")
+  @Get('monthly-completion')
   async getMonthlyCompletion() {
     return this.statsService.getMonthlyCompletion();
   }
 
-  @Get("weekly-completion")
+  @Get('weekly-completion')
   async getWeeklyCompletion() {
     return this.statsService.getWeeklyCompletion();
   }
 
-  @Get("personal")
+  @Get('personal')
   async getPersonalStats(@Req() req: AuthenticatedRequest) {
     const memberId = req.user?.sub;
     if (!memberId)
       throw new UnauthorizedException(EErrorMessage.INVALID_TOKEN_ERROR);
     return this.statsService.getPersonalStats(memberId);
-  } 
-} 
+  }
+}

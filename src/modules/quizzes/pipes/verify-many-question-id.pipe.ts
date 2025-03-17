@@ -1,5 +1,4 @@
 import {
-  ArgumentMetadata,
   BadRequestException,
   Injectable,
   NotFoundException,
@@ -14,10 +13,7 @@ import { verifyObjectId } from 'src/utils';
 export class VerifyManyQuestionIdPipe implements PipeTransform {
   constructor(private readonly questionsSerivice: QuestionsService) {}
 
-  async transform(
-    value: AddManyQuestionDto,
-    metadata: ArgumentMetadata,
-  ): Promise<AddManyQuestionDto> {
+  async transform(value: AddManyQuestionDto): Promise<AddManyQuestionDto> {
     // #1 verify the du body exists
     if (!value?.questionsIds)
       throw new BadRequestException(EErrorMessage.MISSING_QUESTION_IDS_ERROR);
