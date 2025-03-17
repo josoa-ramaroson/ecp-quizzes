@@ -1,0 +1,37 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EErrorMessage = void 0;
+var EErrorMessage;
+(function (EErrorMessage) {
+    EErrorMessage["CORRECT_ANSWERS_NOT_IN_ANSWERS_OPTIONS"] = "correctAnswers must be included in the answersOptions.";
+    EErrorMessage["QUESTIONS_NOT_FOUND"] = "The requested questions are not found in the database.";
+    EErrorMessage["QUESTION_NOT_FOUND"] = "The requested question is not found in the database.";
+    EErrorMessage["UPDATED_QUESTION_NOT_FOUND"] = "The updated questions is not in the database.";
+    EErrorMessage["MEMBER_NOT_FOUND"] = "The requested member is not found in the database.";
+    EErrorMessage["UPDATED_MEMBER_NOT_FOUND"] = "The updated member is not in the database.";
+    EErrorMessage["MEMBER_ALREADY_EXISTS"] = "The member already exists in the database.";
+    EErrorMessage["MEMBER_PSEUDO_ALREADY_USED"] = "The pseudo you entered is already being used by another warrior.";
+    EErrorMessage["AUTH_FAILED_ERROR"] = "Invalid pseudo or password.";
+    EErrorMessage["UNAUTHORIZED_ERROR"] = "Unauthorized access.";
+    EErrorMessage["INVALID_TOKEN_ERROR"] = "Invalid token.";
+    EErrorMessage["QUIZ_NOT_FOUND"] = "The requested quiz is not found in the database";
+    EErrorMessage["QUIZZES_NOT_FOUND"] = "The requested quizzes are not found in the database";
+    EErrorMessage["UPDATED_QUIZ_NOT_FOUND"] = "The updated quiz is not in the database.";
+    EErrorMessage["QUIZZ_ALREADY_EXISTS"] = "The quiz already exists in the database.";
+    EErrorMessage["QUIZZ_ALREADY_TAKEN"] = "The quiz you're trying to evaluate is already taken by the member";
+    EErrorMessage["QUESTION_ALREADY_IN_THE_QUIZ"] = "The question is already in the quiz.";
+    EErrorMessage["QUESTIONS_ALREADY_IN_THE_QUIZ"] = "The questions are already in the quiz.";
+    EErrorMessage["QUESTION_NOT_IN_THE_QUIZ"] = "The question is not in the quiz.";
+    EErrorMessage["MISSING_QUESTION_ID_ERROR"] = "Missing questionId.";
+    EErrorMessage["MISSING_QUESTION_IDS_ERROR"] = "Missing questionIds.";
+    EErrorMessage["QUESTION_IDS_IN_BAD_FORMAT"] = "QuestionIds must be in an array format.";
+    EErrorMessage["INVALID_QUESTION_ID_ERROR"] = "Invalid questionId.";
+    EErrorMessage["INVALID_QUESTION_IDS_ERROR"] = "Invalid questionIds";
+    EErrorMessage["INVALID_RESSOURCE_REFERENCE"] = "Please verify the ressources references in the url.";
+    EErrorMessage["INTERNAL_SERVER_ERROR"] = "We got a problems from the server. Please try again later.";
+    EErrorMessage["ANSWER_HISTORY_NOT_FOUND"] = "The requested answer history is not found in the database.";
+    EErrorMessage["INVALID_DATE_FORMAT"] = "The format of the date is invalid.";
+    EErrorMessage["NO_CORRECT_ANSWER"] = "You should add at least one correct answer to the question.";
+    EErrorMessage["INVALID_ANSWER_OPTIONS"] = "The provided answer options was invalid.";
+})(EErrorMessage || (exports.EErrorMessage = EErrorMessage = {}));
+//# sourceMappingURL=error-message.enum.js.map
