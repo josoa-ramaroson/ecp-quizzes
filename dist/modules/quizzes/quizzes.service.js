@@ -93,7 +93,6 @@ let QuizzesService = class QuizzesService {
     }
     async findSinceNow() {
         const date = new Date();
-        date.setDate(date.getDate() - 1);
         const existingQuizzes = await this.findAllBefore(date);
         return existingQuizzes;
     }
