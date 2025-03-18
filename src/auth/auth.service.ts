@@ -23,6 +23,7 @@ export class AuthService {
     const member = await this.memberService.findOneByPseudo(pseudo);
     const hashedPassword = member.password;
 
+    console.log(member)
     const isAuthenticated = await this.hashingService.verifyPassword(
       password,
       hashedPassword,

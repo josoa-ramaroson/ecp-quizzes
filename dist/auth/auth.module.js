@@ -14,6 +14,8 @@ const members_1 = require("../modules/members");
 const shared_1 = require("../shared");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
+const guards_1 = require("./guards");
+const core_1 = require("@nestjs/core");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -36,6 +38,10 @@ exports.AuthModule = AuthModule = __decorate([
         controllers: [auth_controller_1.AuthController],
         providers: [
             auth_service_1.AuthService,
+            {
+                provide: core_1.APP_GUARD,
+                useClass: guards_1.AuthGuard,
+            },
         ],
     })
 ], AuthModule);
