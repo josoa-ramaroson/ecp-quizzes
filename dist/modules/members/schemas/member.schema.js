@@ -36,7 +36,7 @@ __decorate([
     __metadata("design:type", String)
 ], Member.prototype, "password", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, mongoose_1.Prop)({ default: 0 }),
     __metadata("design:type", Number)
 ], Member.prototype, "totalScore", void 0);
 __decorate([

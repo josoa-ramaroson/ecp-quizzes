@@ -18,7 +18,7 @@ export class Member {
   @Prop({ required: true })
   password: string;
 
-  @Prop()
+  @Prop({ default: 0 })
   totalScore: number;
 
   @Prop({ default: false })

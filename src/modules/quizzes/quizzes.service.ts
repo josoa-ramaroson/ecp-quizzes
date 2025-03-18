@@ -29,6 +29,7 @@ export class QuizzesService {
   ) {}
 
   async createOne(createQuizDto: CreateQuizDto): Promise<IQuiz> {
+    
     const newQuizz = new this.quizModel(createQuizDto);
     return await newQuizz.save();
   }
@@ -111,7 +112,6 @@ export class QuizzesService {
 
   async findSinceNow(): Promise<IQuiz[]> {
     const date = new Date();
-    date.setDate(date.getDate() - 1);
 
     const existingQuizzes = await this.findAllBefore(date);
     return existingQuizzes;
