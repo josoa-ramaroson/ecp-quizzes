@@ -104,7 +104,7 @@ export class QuestionsService {
     // #4 check if the answers are correct
 
     if (isSubArray<string>(correctAnswersIds, providedAnswersIds))
-      if (correctAnswersIds.length == correctAnswersIds.length)
+      if (providedAnswersIds.length == correctAnswersIds.length)
         score = existingQuestion.score;
       else score = Math.round(existingQuestion.score / 2);
     return score;
