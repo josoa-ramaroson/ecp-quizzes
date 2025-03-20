@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsDateString,
@@ -20,10 +21,12 @@ export class CreateQuizDto {
 
   @IsDateString()
   @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
   readonly startDate: Date;
-
+  
   @IsDateString()
   @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
   readonly deadline: Date;
 
   @IsBoolean()
