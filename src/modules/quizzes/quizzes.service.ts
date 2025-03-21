@@ -61,10 +61,9 @@ export class QuizzesService {
     date: Date,
     filter?: Record<string, string | boolean | number>,
   ): Promise<IQuiz> {
-    date.setUTCHours(0, 0, 0, 0);
     const deadline = new Date(date);
     deadline.setUTCDate(deadline.getDate() + 1);
-    deadline.setUTCHours(0, 0, 0, 0);
+    deadline.setUTCHours(23, 59, 59, 59);
     const existingQuizz = await this.quizModel.findOne({
       startDate: { $gte: date },
       deadline: { $lte: deadline },
@@ -105,6 +104,8 @@ export class QuizzesService {
 
   async findDaily(memberId: string): Promise<ResponseQuizzesOfMember> {
     const date = new Date();
+    date.setUTCHours(0,0,0,0);
+    date.setUTCHours( date.getUTCHours() - 4);
     const existingQuizz = await this.findOneByDate(date, { isDaily: true });
 
     return await this.fillMemberInfoToQuiz(existingQuizz, memberId);
