@@ -263,6 +263,7 @@ export class QuizzesService {
       title: existingQuiz.title,
       description: existingQuiz.description,
       questions,
+      status: getQuizStatus(existingQuiz),
       totalScore: answerHistory?.score,
       maxScore,
       isCompleted: !!answerHistory,
