@@ -3,6 +3,7 @@ import { EQuizSTatus, IQuiz } from 'src/common';
 export function getQuizStatus(quiz: IQuiz): EQuizSTatus {
   const nowDate = new Date();
   nowDate.setUTCHours(0, 0, 0, 0);
+  nowDate.setUTCHours(nowDate.getUTCHours() - 4);
   const startDate = quiz.startDate;
   const deadline = quiz.deadline;
   // if (nowDate.getDay())
